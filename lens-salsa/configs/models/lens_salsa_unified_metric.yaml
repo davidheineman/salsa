@@ -1,0 +1,79 @@
+unified_metric:
+  class_path: comet.models.UnifiedMetric
+  init_args:
+    nr_frozen_epochs: 0.3
+    keep_embeddings_frozen: True
+    optimizer: AdamW
+    encoder_learning_rate: 1.0e-05 # 1.0e-06
+    learning_rate: 3.1e-05 # 1.5e-05
+    layerwise_decay: 0.95
+    encoder_model: RoBERTa
+    pretrained_model: roberta-large
+    sent_layer: mix
+    layer_transformation: sparsemax
+    word_layer: 24
+    loss: mse
+    dropout: 0.15
+    batch_size: 4
+    train_data: 
+      - /nethome/dheineman3/nlprx/lens-salsa/data/salsa/train.csv
+    validation_data: 
+      - /nethome/dheineman3/nlprx/lens-salsa/data/salsa/valid.csv
+    hidden_sizes:
+      - 384
+      # - 3072
+      # - 1024
+    activations: Tanh
+    loss_lambda: 0.9
+    initalize_pretrained_unified_weights: True # Unified metric pre-training
+    pretrained_unified_model: /nethome/dheineman3/nlprx/lens-salsa/checkpoints/lens-pretrained-unified/checkpoints/epoch=3-step=22500-val_kendall=0.628.ckpt
+    word_level_training: True
+    score_target: lens_score # Score estimation target
+
+    continuous_word_labels: False
+    input_segments:
+      - edit_id_simplified # mt
+      - edit_id_original # src
+    span_targets: # Sequence classification targets
+      - edit_id_simplified # mt
+      - edit_id_original  # src
+    word_weights:
+      - 0.1 # OK
+      - 0.9 # BAD
+    span_tokens: # Sequence classification tokens
+      - bad
+
+    # continuous_word_labels: False
+    # input_segments:
+    #   - word_qe_simplified # mt
+    #   - word_qe_original # src
+    # span_targets: # Sequence classification targets
+    #   - word_qe_simplified # mt
+    #   - word_qe_original  # src
+    # word_weights:
+    #   - 0.15 # OK
+    #   - 0.25 # GOOD
+    #   - 0.60 # BAD
+    # span_tokens: # Sequence classification tokens
+    #   - good
+    #   - bad
+    
+    # continuous_word_labels: True
+    # input_segments:
+    #   - word_ratings_simplified
+    #   - word_ratings_original
+    # span_targets:
+    #   - word_ratings_simplified
+    #   - word_ratings_original
+    # span_tokens:
+    #   - -3
+    #   - -2
+    #   - -1
+    #   - 0
+    #   - 1
+    #   - 2
+    #   - 3
+    
+trainer: ../trainer.yaml
+early_stopping: ../early_stopping.yaml
+model_checkpoint: ../model_checkpoint.yaml

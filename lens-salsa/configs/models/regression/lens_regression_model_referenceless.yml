@@ -1,0 +1,31 @@
+referenceless_regression_metric:
+  class_path: comet.models.ReferencelessRegression
+  init_args:
+    nr_frozen_epochs: 0.3
+    keep_embeddings_frozen: True
+    optimizer: AdamW
+    encoder_learning_rate: 1.0e-05
+    learning_rate: 3.1e-05
+    layerwise_decay: 0.95
+    encoder_model: RoBERTa
+    pretrained_model: roberta-large
+    pool: avg
+    layer: mix
+
+    layer_transformation: sparsemax
+    layer_norm: False
+    loss: mse
+    activations: Tanh
+
+    dropout: 0.15
+    batch_size: 8
+    train_data: 
+      - ~/nlprx/lens-salsa/data/simpeval-regression/train.csv
+    validation_data: 
+      - ~/nlprx/lens-salsa/data/simpeval-regression/valid.csv
+    hidden_sizes:
+      - 384
+
+trainer: ../trainer.yaml
+early_stopping: ../early_stopping.yaml
+model_checkpoint: ../model_checkpoint.yaml
