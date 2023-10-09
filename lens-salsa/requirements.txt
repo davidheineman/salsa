@@ -1,3 +1,10 @@
 gdown
-unbabel-comet
 lens
+scipy
+sklearn
+jsonargparse
+pytorch_lightning<=2.0.9
+torch
+transformers
+numpy
+pandas

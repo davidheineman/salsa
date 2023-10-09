@@ -1,0 +1,390 @@
+.container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-bottom: 1rem;
+  }
+  
+.card {
+    border-radius: 4px;
+    margin-left: auto;
+    margin-right: auto;
+}
+  
+.card-body {
+    margin-left: auto!important;
+    margin-right: auto!important;
+}
+
+.border-deletion {
+    border-bottom: 3px solid #ee2a2a;
+}
+
+.border-deletion-all {
+    border: 2px solid #ee2a2a;
+}
+
+.bg-deletion {
+    background-color: #ee2a2a;
+}
+
+.txt-deletion {
+    color: #ee2a2a;
+}
+
+.border-insertion {
+    border-bottom: 3px solid #64c466;
+}
+
+.border-insertion-all {
+    border: 2px solid #64c466;
+}
+
+.bg-insertion {
+    background-color: #64c466;
+}
+
+.txt-insertion {
+    color: #64c466;
+}
+
+
+.border-substitution {
+    border-bottom: 3px solid #2186eb;
+}
+
+.border-substitution-all {
+    border: 2px solid #2186eb;
+}
+
+.bg-substitution {
+    background-color: #2186eb;
+}
+
+.txt-substitution {
+    color: #2186eb;
+}
+
+.border-split {
+    border-bottom: 3px solid #F7CE46;
+}
+
+.border-split-all {
+    border: 2px solid #F7CE46;
+}
+
+.bg-split {
+    background-color: #F7CE46;
+}
+
+.txt-split {
+    color: #F7CE46;
+}
+
+.border-reorder {
+    border-bottom: 3px solid #3ca3a7;
+}
+
+.border-reorder-all {
+    border: 2px solid #3ca3a7;
+}
+
+.bg-reorder {
+    background-color: #3ca3a7;
+}
+
+.txt-reorder {
+    color: #3ca3a7;
+}
+
+.border-structure {
+    border-bottom: 3px solid #e67c43;
+}
+
+.border-structure-all {
+    border: 2px solid #e67c43;
+}
+
+.bg-structure {
+    background-color: #e67c43;
+}
+
+.txt-structure {
+    color: #e67c43;
+}
+
+.bg-substitution-light {
+    background-color: #ADC5FA;
+}
+
+.bg-insertion-light {
+    background-color: #D2E7BA;
+}
+
+.bg-deletion-light {
+    background-color: #F4B8B1;
+}
+
+.bg-split-light {
+    background-color: #FAE5AF;
+}
+
+.bg-reorder-light {
+    background-color: #b6e3e5;
+}
+
+.bg-structure-light {
+    background-color: #f2bda1;
+}
+
+.border-deletion-light {
+    border-bottom: 3px solid #F4B8B1;
+}
+
+.border-substitution-light {
+    border-bottom: 3px solid #ADC5FA;
+}
+
+.border-insertion-light {
+    border-bottom: 3px solid #D2E7BA;
+}
+
+.border-split-light {
+    border-bottom: 3px solid #FAE5AF;
+}
+
+.border-reorder-light {
+    border-bottom: 3px solid #b6e3e5;
+}
+
+.border-structure-light {
+    border-bottom: 3px solid #f2bda1;
+}
+
+.border-deletion-light-all {
+    border: 2px solid #F4B8B1;
+}
+
+.border-substitution-light-all {
+    border: 2px solid #ADC5FA;
+}
+
+.border-insertion-light-all {
+    border: 2px solid #D2E7BA;
+}
+
+.border-split-light-all {
+    border: 2px solid #FAE5AF;
+}
+
+.border-reorder-light-all {
+    border: 2px solid #b6e3e5;
+}
+
+.border-structure-light-all {
+    border: 2px solid #f2bda1;
+}
+
+.txt-deletion-light {
+    color: #F4B8B1;
+}
+
+.txt-substitution-light {
+    color: #ADC5FA;
+}
+
+.txt-insertion-light {
+    color: #D2E7BA;
+}
+
+.txt-split-light {
+    color: #FAE5AF;
+}
+
+.txt-reorder-light {
+    color: #b6e3e5;
+}
+
+.txt-structure-light {
+    color: #f2bda1;
+}
+
+.w-13 {
+    width: 13%;
+}
+
+.w-15 {
+    width: 15%;
+}
+
+.w-16 {
+    width: 16.6%;
+}
+
+#lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    /* width: 100%;
+    height: 100%; */
+}
+
+.light-orange {
+    color: #ff9d5e
+}
+
+.light-purple {
+    color: #be90f6
+}
+
+.brown {
+    color: #c46f32
+}
+
+.default_cursor {
+    cursor: default !important;
+}
+
+.mt3-5 {
+    margin-top: 1.5rem;
+}
+
+.mb3-5 {
+    margin-bottom: 1.5rem;
+}
+
+.prev-next-btns {
+    transition: 0.3s;
+}
+
+.prev-next-btns:hover {
+    opacity: 0.6;
+}
+
+.tooltiptext {
+    visibility: hidden;
+    width: 13px;
+    font-size: 10px;
+    text-align: center;
+    /* border-radius: 6px; */
+    padding: 1px 0;
+    position: absolute;
+    z-index: 1;
+    bottom: 100%;
+    left: -15%;
+    /* margin-left: -60px; */
+    /* Fade in tooltip - takes 1 second to go from 0% to 100% opac: */
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+
+.circle {
+    border-radius: 50%;
+    border: 0.9px solid #DDDDDD;
+    width: 10px;
+    height: 10px;
+    display: inline-block;
+    margin-right: 0.5rem;
+    background-color: #DDDDDD;
+    transition: all 0.2s ease-in-out;
+    position: relative;
+}
+
+.circle:hover { 
+    border: 1.1px solid black;
+    transform: scale(1.15); 
+}
+
+.circle:hover .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
+
+.circle-active {
+    border: 1.1px solid black !important;
+    transform: scale(1.15); 
+}
+
+.circle-bookmark {
+    background-color: rgb(255, 82, 82);
+    border-color: rgb(255, 82, 82);
+}
+
+.circle-finished {
+    background-color: rgb(31, 227, 41);
+    border-color: rgb(31, 227, 41);
+}
+
+
+.tooltiptext-bookmark {
+    color:rgb(255, 82, 82)
+}
+
+.tooltiptext-finished {
+    color:rgb(31, 227, 41)
+}
+
+.bookmark {
+    transition: all 0.2s ease-in-out;
+}
+
+.bookmark-active {
+    color:rgb(255, 82, 82);
+    background-color: rgb(255, 82, 82)
+}
+
+
+#response_box {
+    position: fixed;
+    top: 72px;
+    left: 83%;
+}
+
+#helper_list {
+    position: fixed;
+    top: 72px;
+    left: 2%;
+}
+
+.w2-5 {
+    width: 2.3em;
+}
+
+.h2-5 {
+    height: 2.3em;
+}
+
+.comment_area {
+    position: relative;
+    display: block;
+    font-size: 16px;
+    line-height: 1.2;
+    border-color: #57b846;
+    height: 120px;
+    width: 260px;
+}
+
+textarea {
+    outline: none;
+    /* border: none; */
+}
+
+.w-65 {
+    width: 65%;
+}
+
+span.outside {
+    padding-bottom: 6px;
+}
+
+span.middleside {
+    padding-bottom: 4.5px;
+}
+
+.lh-paras {
+    line-height: 1.7;
+}
+
+.lh-paras-2 {
+    line-height: 2;
+}

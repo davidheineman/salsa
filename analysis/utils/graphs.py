@@ -1,13 +1,14 @@
+import copy
+
 import matplotlib.pyplot as plt
 import matplotlib.transforms as mtrans
 import plotly.graph_objects as go
 import numpy as np
 import matplotlib as mpl
-import copy
+
 from utils.names import *
 from utils.util import *
 from utils.dataloader import quality_mapping
-from scipy.stats import kendalltau
 
 # Temporary for getting rid of errors
 import warnings
@@ -21,13 +22,7 @@ color_mapping = {
     'split': '#F7CE46',
     'reorder': '#3ca3a7',
     'structure': '#FF9F15',
-
-    # Information.MORE: '#64C466',
-    # Information.SAME: '#2186eb',
-    # Information.LESS: '#ee2a2a',
-    # Information.DIFFERENT: '#b103fc',
-
-    # Less saturated versions of these colors
+    
     Information.MORE: '#86d95d',
     Information.SAME: '#428cd6',
     Information.LESS: '#f24949',
@@ -323,216 +318,6 @@ def errors_by_system(data, include_deletions=False):
     plt.xticks(x, [x.value for x in plotted_errors], rotation=45, ha="right")
     plt.show()
 
-def sankey_seperated(data):
-    # Create a tree of edit types, following the decision tree
-    root = Node(count_data(data), 'edits', -1)
-
-    # Ideally shouldn't be doing this...
-    edit_types = [val.value.lower() for val in Edit]
-    information_mapping = {val.value.lower(): val for val in Information}
-
-    counter = 0
-    for edit_type in edit_types:
-        root.add_child(Node(count_data(data, edit_type=edit_type), edit_type, counter))
-        counter += 1
-
-    for node in root.get_children():
-        for info_change in information_mapping.values():
-            node.add_child(Node(count_data(data, edit_type=node.label, information_impact=info_change), info_change, counter))
-            counter += 1
-        for child in node.get_children():
-            for quality_type in Quality:
-                child.add_child(Node(count_data(data, edit_type=node.label, information_impact=child.label, quality_type=quality_type), quality_type, counter))
-                counter += 1
-
-    # Convert the tree to a list of nodes & links
-    stack = [child for child in root.get_children()]
-    nodes, links = [], []
-    while len(stack) > 0:
-        node = stack.pop()
-
-        # Map color if it has a mapping
-        color = 'black'
-        if node.label in color_mapping.keys():
-            color = color_mapping[node.label]
-
-        # Map label if it has a mapping
-        in_mapping_back = {information_mapping[k]: k for k in information_mapping}
-        if node.label in in_mapping_back.keys():
-            node.label = in_mapping_back[node.label]
-        impact_mapping_back = {impact_mapping_for_visualization[k]: k for k in impact_mapping_for_visualization}
-        if node.label in impact_mapping_back.keys():
-            node.label = impact_mapping_back[node.label]
-
-        nodes.append({'id': node.id, 'label': node.label, 'color': color})
-
-        # Get links to children
-        for child in node.get_children():
-            if child.amount > 0:
-                links.append({'source': node.id, 'target': child.id, 'value': child.amount})
-            stack.append(child)
-
-    # Sort nodes by id
-    nodes = sorted(nodes, key=lambda x: x['id'])
-
-    # Convert dict tree values to lists
-    labels, colors = [str(x['label']) for x in nodes], [x['color'] for x in nodes]
-    sources, targets, values = [x['source'] for x in links], [x['target'] for x in links], [x['value'] for x in links]
-
-    fig = go.Figure(data=[go.Sankey(
-        node = dict(
-        pad = 5,
-        thickness = 10,
-        line = dict(color = "black", width = 0.5),
-        label = labels,
-        color = colors
-        ),
-        link = dict(
-        source = sources, # index of source node
-        target = targets, # index of end node
-        value = values,   # amount in link
-        # label = data['link']['label'],   # label of link (not necessary)
-        # color = data['link']['color']
-        ),
-        valueformat = "d",
-        valuesuffix = " edits"
-    )
-    ])
-
-    fig.update_layout(title_text="Edit Type Distribution", font_size=11, width=500, height=500)
-    fig.show()
-
-def sankey_combined(data):
-    # Create nodes for each type
-    nodes = {}
-    links = []
-    length_normalized = False
-    counter = 0
-
-    # Ideally shouldn't have to do this...
-    edit_types = [val.value.lower() for val in Edit]
-    information_mapping = {val.value.lower(): val for val in Information}
-
-    for edit_type in edit_types:
-        nodes[edit_type] = Node(count_data(data, edit_type=edit_type, length_normalized=length_normalized), edit_type, counter)
-        counter += 1
-
-    for info_change in Information:
-        nodes[info_change] = Node(count_data(data, information_impact=info_change, length_normalized=length_normalized), info_change, counter)
-        counter += 1
-
-    for quality_type in Quality:
-        nodes[quality_type] = Node(count_data(data, quality_type=quality_type, length_normalized=length_normalized), quality_type, counter)
-        counter += 1
-
-    for error_type in Error:
-        nodes[error_type] = Node(count_data(data, error_type=error_type, length_normalized=length_normalized), error_type, counter)
-        counter += 1
-
-    for rating in range(4):
-        nodes[rating] = Node(count_data(data, quality_type=Quality.QUALITY, rating=rating, length_normalized=length_normalized), rating, counter)
-        counter += 1
-
-    for rating in range(3):
-        nodes["trivial_" + str(rating)] = Node(count_data(data, quality_type=Quality.TRIVIAL, rating=rating, length_normalized=length_normalized), "trivial_" + str(rating), counter)      
-        counter += 1
-
-    # Substitution trivial insertions have no efficacy, include this
-    nodes["trivial_4"] = Node(count_data(data, quality_type=Quality.TRIVIAL, rating=None, length_normalized=length_normalized), "trivial_4", counter)
-    counter += 1
-
-    # create edit_type -> info_change links
-    for edit_type in edit_types:
-        for info_change in Information:
-            amt = count_data(data, edit_type=edit_type, information_impact=info_change, length_normalized=length_normalized)
-            links.append({'source': nodes[edit_type].id, 'target': nodes[info_change].id, 'value': amt})
-
-    # create info_change -> quality_type links
-    for info_change in Information:
-        for quality_type in Quality:
-            amt = count_data(data, information_impact=info_change, quality_type=quality_type, length_normalized=length_normalized)
-            links.append({'source': nodes[info_change].id, 'target': nodes[quality_type].id, 'value': amt})
-
-    # create quality_type -> error_type links
-    for quality_type in Quality:
-        for error_type in Error:
-            amt = count_data(data, quality_type=quality_type, error_type=error_type, length_normalized=length_normalized)
-            links.append({'source': nodes[quality_type].id, 'target': nodes[error_type].id, 'value': amt})
-
-    # create quality_type -> rating links
-    for rating in range(4):
-        amt = count_data(data, quality_type=Quality.QUALITY, rating=rating, length_normalized=length_normalized)
-        links.append({'source': nodes[Quality.QUALITY].id, 'target': nodes[rating].id, 'value': amt})
-
-    # create trivial -> rating links
-    for rating in range(3):
-        trivial_node_name = "trivial_" + str(rating)
-        amt = count_data(data, quality_type=Quality.TRIVIAL, rating=rating, length_normalized=length_normalized)
-        links.append({'source': nodes[Quality.TRIVIAL].id, 'target': nodes[trivial_node_name].id, 'value': amt})
-
-    # create trivial -> trivial paraphrase links
-    trivial_node_name = "trivial_4"
-    amt = count_data(data, quality_type=Quality.TRIVIAL, rating=None, length_normalized=length_normalized)
-    links.append({'source': nodes[Quality.TRIVIAL].id, 'target': nodes[trivial_node_name].id, 'value': amt})
-
-    nodes = [{'id': x.id, 'label': x.label, 'color': 'black'} for x in nodes.values()]
-
-    for node in nodes:
-        # Map color if it has a mapping
-        if node['label'] in color_mapping.keys():
-            node['color'] = color_mapping[node['label']]
-
-        # Map label if it has a mapping
-        name_mapping = {}
-        name_mapping.update({information_mapping[k]: k for k in information_mapping})
-        name_mapping.update({impact_mapping_for_visualization[k]: k for k in impact_mapping_for_visualization})
-        name_mapping.update(error_name_mapping)
-        name_mapping.update({quality_mapping[k]: k for k in quality_mapping})
-
-        # Teporary trivial name mapping
-        name_mapping.update({
-            "trivial_0": "0 Rating",
-            "trivial_1": "1 Rating",
-            "trivial_2": "2 Rating",
-            "trivial_4": "Trivial Paraphrase",
-        })
-
-        if node['label'] in name_mapping.keys():
-            node['label'] = name_mapping[node['label']]
-
-    # Convert dict tree values to lists
-    labels, colors = [str(x['label']).capitalize() for x in nodes], [x['color'] for x in nodes]
-    sources, targets, values = [x['source'] for x in links], [x['target'] for x in links], [x['value'] for x in links]
-
-    fig = go.Figure(data=[go.Sankey(
-            node = dict(
-            pad = 15,
-            thickness = 10,
-            line = dict(color = "black", width = 0.5),
-            label = labels,
-            color = colors
-            ),
-            link = dict(
-                source = sources, # index of source node
-                target = targets, # index of end node
-                value = values,   # amount in link
-                # label = data['link']['label'],   # label of link (not necessary)
-                # color = data['link']['color']
-            ),
-            valueformat = "d",
-            valuesuffix = " edits"
-        ),]   
-    )
-    fig.update_layout(
-        title_text="", 
-        # font_family="Times New Roman",
-        font_color="black",
-        font_size=11, 
-        width=700,
-        height=500
-    )
-    fig.show()
-    
 def draw_agreement(sents, paper=False):
     sents = sorted(sents, key=lambda x: x['user'], reverse=True)
     annotator = sorted(list(set([f"{x['user']}\nBatch {x['batch']}\nHIT {x['hit_id']+1}" for x in sents])), reverse=True)
@@ -604,64 +389,6 @@ def avg_span_size(annotations):
     ax.bar(edit_type_labels, span_size, width, color=[color_mapping[label] for label in edit_type_labels])
     ax.set_xlabel('System')
     ax.set_title('Average Edit Span Size')
-    plt.show()
-
-def score_distribution(data, include_simpeval=False):
-    annotations = sorted([x for y in [sent['processed_annotations'] for sent in data] for x in y], key=lambda x: x['score'])
-
-    # Print distribution of edit scores
-    n_bins = 100
-
-    if include_simpeval:
-        fig, axs = plt.subplots(2, 2, tight_layout=True)
-        axs[0, 0].hist([x['score'] for x in annotations], bins=n_bins)
-        axs[0, 0].set_title("Distribution of Edit Scores")
-
-        # Print distribution of sentence scores
-        axs[0, 1].hist([x['score'] for x in data], bins=n_bins)
-        axs[0, 1].set_title("Distribution of Sentence Scores")
-
-        # Print distribution of simp eval scores
-        axs[1, 0].hist([i for j in [x['simpeval_scores'] for x in data if x['simpeval_scores'] is not None] for i in j], bins=n_bins)
-        axs[1, 0].set_title("Distribution of SimpEval Scores")
-
-        # Print distribution of simp eval scores
-        axs[1, 1].hist([avg(x['simpeval_scores']) for x in data if x['simpeval_scores'] is not None], bins=n_bins)
-        axs[1, 1].set_title("Distribution of Avg. SimpEval Scores")
-        fig.show()
-    else:
-        fig, axs = plt.subplots(1, 2, tight_layout=True)
-        axs[0].hist([x['score'] for x in annotations], bins=n_bins)
-        axs[0].set_title("Distribution of Edit Scores")
-
-        # Print distribution of sentence scores
-        axs[1].hist([x['score'] for x in data], bins=n_bins)
-        axs[1].set_title("Distribution of Sentence Scores")
-    fig.show()
-
-def simpeval_agreement(data, average=True):
-    if (average):
-        scores = []
-        for sent in data:
-            if sent['simpeval_scores'] is not None and len(sent['simpeval_scores']) != 0:
-                scores += [(avg(sent['simpeval_scores'], prec=5), sent['score'])]
-            else:
-                scores += [(0, sent['score'])]
-    else:
-        # Simply takes the first annotator
-        scores = []
-        for sent in data:
-            if sent['simpeval_scores'] is not None and len(sent['simpeval_scores']) != 0:
-                scores.append((int(sent['simpeval_scores'][0]), sent['score']))
-            else:
-                scores.append((0, sent['score']))
-    pts = [p for p in scores if p[0] != 0]
-    kt = kendalltau([p[0] for p in pts], [p[1] for p in pts])
-    plt.scatter([p[0] for p in pts], [p[1] for p in pts], c ="red", alpha=0.2)
-    plt.xlabel('Average SimpEval score')
-    plt.ylabel('Our score')
-    plt.figtext(.1, .8, f"corr = {kt.correlation:.2f} | p = {kt.pvalue:.2f}")
-    plt.title(f'SimpEval Correlation ({len(pts)} sentences)')
     plt.show()
 
 def edit_length(data, systems, type_='edit_dist', simpeval=False, average_scores=False):
@@ -928,8 +655,6 @@ def edits_by_family_separated(data, savefig=False):
     else:
         plt.show()
 
-# Select one of : Paraphrase, Split, Structure, Reorder
-# Could do this with deletions as well
 def ratings_by_edit_type(data, edit_type):
     out = get_ratings_by_edit_type(data, edit_type)
 
@@ -1018,41 +743,7 @@ def avg_edit_ratings(data):
 
     plt.show()
 
-def edit_ratings_barh_old(data):
-    fam = edit_ratings_by_family(data)
-    fig, ax = plt.subplots(len(fam.keys()), 4)
-    for i, family in enumerate(fam.keys()):
-        ratings = fam[family]
-
-        for j, system in enumerate([s for s in all_system_labels if s in ratings.keys()]):
-            left = 0
-            color = color_mapping[family]
-            for k, rating in enumerate(ratings[system]):
-                if j == 0:
-                    label = family.capitalize()
-                else:
-                    label = ' '
-                
-                ax[i, j].barh(label, rating, left=left, color=color, alpha=k*(1/7))
-                left += rating
-            if i == 0:
-                ax[i, j].set_title(system_name_mapping[system])
-
-            ax[i, j].set_xticks([])
-
-            ax[i, j].spines['bottom'].set_visible(False)
-            ax[i, j].spines['top'].set_visible(False)
-            ax[i, j].spines['left'].set_visible(False)
-            ax[i, j].spines['right'].set_visible(False)
-
-    fig.tight_layout()
-    plt.show()
-
-def edit_ratings_barh(data, include_all=True, old_formatting=False, size_weighted=False):
-    if old_formatting:
-        edit_ratings_barh_old(data)
-        return
-
+def edit_ratings_barh(data, include_all=True, size_weighted=False):
     fam = edit_ratings_by_family(data, size_weighted=size_weighted)
     sys = list(list(fam.values())[0].keys())
 

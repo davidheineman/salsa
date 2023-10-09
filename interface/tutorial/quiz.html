@@ -1,0 +1,1329 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Annotation</title>
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"
+        integrity="sha256-QWo7LDvxbWT2tbbQ97B53yJnYU3WhH/C8ycbRAkjPDc=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://kit.fontawesome.com/c3b36ffc0c.js" crossorigin="anonymous"></script>
+    <script src="../js/leader-line.min.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.10.0/css/tachyons.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.7.2/animate.min.css">
+    <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/selection.css">
+    <link rel="stylesheet" href="../css/button.css">
+    <link rel="stylesheet" href="../css/select_box.css">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+</head>
+
+<body class="sans-serif">
+    <div id="app" class="container w-90 mv3 mb-3 card-body">
+        <section id="hit">
+            <div>
+                <div class="ba b--black-80 br2 pa2">
+                    <div class="cf">
+                        <p class="fl f3 mt1 mb1">
+                            <span class="f5">Original Sentence (Human Written):</span>
+                        </p>
+                        <!-- <div class="fr">
+                            <i @click="bookmark_this_hit" class="bookmark fa-regular fa-bookmark fa-lg pointer"></i>
+                        </div> -->
+                    </div>
+                    
+                    <component :is="compiled_original_html"></component>
+                    <!-- <div class="f4 lh-copy" v-html="original_html"></div> -->
+                    <p class="f3 mb1">
+                        <span class="f5">Simplified Sentence (Human or AI Model Written):</span>
+                    </p>
+                    <component :is="compiled_simplified_html"></component>
+                    <!-- <div class="f4 mb2 lh-copy" v-html="simplified_html"></div> -->
+                </div>
+            </div>
+            <div class="quality-selection-divs">
+                <div class="quality-selection w-100" id="add_an_edit">
+                    <p class="f3 courier ttu mv1">Adding an Edit <i class="fa-solid fa-plus"></i></p>
+        
+                    <!-- <input type="text" id="text_input" name="quality" placeholder="type your problem"> -->
+                    <div id="dropdown-button-container">
+                        <div class="over-hide z-bigger mt2">
+                            <div class="row">
+                                <p class="mb2 b tracked-light">Select the Edit Category.</i>
+                                </p>
+                                <div class="tc mb3">
+                                    <div class="w-15 mr2 dib">
+                                        <input @click="show_span_selection" class="checkbox-tools-edit-category checkbox-tools" type="radio" name="edit_cotegory"
+                                            id="edit_cotegory-deletion" value="deletion">
+                                        <label class="txt-deletion" for="edit_cotegory-deletion">
+                                            <i class="fa-solid fa-delete-left fa-1-5x mb1"></i>
+                                            Deletion
+                                        </label>
+                                    </div>
+                                    <div class="w-15 mr2 dib">
+                                        <input @click="show_span_selection" class="checkbox-tools-edit-category checkbox-tools" type="radio" name="edit_cotegory"
+                                            id="edit_cotegory-insertion" value="insertion">
+                                        <label class="txt-insertion" for="edit_cotegory-insertion">
+                                            <i class="fa-solid fa-circle-plus fa-1-5x mb1"></i>
+                                            Insertion
+                                        </label>
+                                    </div>
+                                    <div class="w-15 mr2 dib">
+                                        <input @click="show_span_selection" class="checkbox-tools-edit-category checkbox-tools" type="radio" name="edit_cotegory"
+                                            id="edit_cotegory-substitution" value="substitution">
+                                        <label class="txt-substitution" for="edit_cotegory-substitution">
+                                            <i class="fa-solid fa-sort fa-1-5x mb1"></i>
+                                            Substitution
+                                        </label>
+                                    </div>
+                                    <div class="w-15 mr2 dib">
+                                        <input @click="show_span_selection" class="checkbox-tools-edit-category checkbox-tools" type="radio" name="edit_cotegory"
+                                            id="edit_cotegory-reorder" value="reorder">
+                                        <label class="txt-reorder" for="edit_cotegory-reorder">
+                                            <i class="fa-solid fa-arrows-left-right fa-1-5x mb1"></i>
+                                            Reorder
+                                        </label>
+                                    </div>
+                                    <div class="w-15 mr2 dib">
+                                        <input @click="show_span_selection" class="checkbox-tools-edit-category checkbox-tools" type="radio" name="edit_cotegory"
+                                            id="edit_cotegory-split" value="split">
+                                        <label class="txt-split" for="edit_cotegory-split">
+                                            <i class="fa-solid fa-grip-lines-vertical fa-1-5x mb1"></i>
+                                            Split
+                                        </label>
+                                    </div>
+                                    <div class="w-15 dib">
+                                        <input @click="show_span_selection" class="checkbox-tools-edit-category checkbox-tools" type="radio" name="edit_cotegory"
+                                            id="edit_cotegory-structure" value="structure">
+                                        <label class="txt-structure" for="edit_cotegory-structure">
+                                            <i class="fa-solid fa-tree fa-1-5x mb1"></i>
+                                            Structure
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="span-selection-div" data-category="deletion">
+                                    <p class="mt0 mb2 b tracked-light">Select the deleted text span from the <i>Original Sentence</i>.
+                                    </p>
+                                    <p class="tracked-light">Selected span: <span class="bg-deletion-light">{{selected_span_in_original}}</span></p>
+                                </div>
+                               
+                                <div class="span-selection-div" data-category="insertion">
+                                    <p class="mt0 mb2 b tracked-light">Select the newly inserted text span from the <i>Simplified Sentence</i>.
+                                    </p>
+                                    <p class="tracked-light">Selected span: <span class="bg-insertion-light">{{selected_span_in_simplified}}</span></p>
+                                </div>
+
+                                <div class="span-selection-div" data-category="substitution">
+                                    <p class="mt0 mb2 b tracked-light">Select or click the text span from the <i>Original Sentence</i>.
+                                    </p>
+                                    <p class="tracked-light">Selected span: <span class="bg-substitution-light">{{selected_span_in_original}}</span></p>
+                                    <div class="">
+                                        <p class="mb2 b tracked-light">Select or click the text span from the <i>Simplified Sentence</i>.
+                                        </p>
+                                        <p class="tracked-light">Selected span: <span class="bg-substitution-light">{{selected_span_in_simplified}}</span></p>
+                                    </div>
+                                </div>
+
+                                <div class="span-selection-div" data-category="reorder">
+                                    <p class="mt0 mb2 b tracked-light">Select or click the text span from the <i>Original Sentence</i>.
+                                    </p>
+                                    <p class="tracked-light">Selected span: <span class="bg-reorder-light">{{selected_span_in_original}}</span></p>
+                                    <div class="">
+                                        <p class="mb2 b tracked-light">Select or click the substitution span from the <i>Simplified Sentence</i>.
+                                        </p>
+                                        <p class="tracked-light">Selected span: <span class="bg-reorder-light">{{selected_span_in_simplified}}</span></p>
+                                    </div>
+                                </div>
+
+                                <div class="span-selection-div" data-category="split">
+                                    <p class="mt0 mb2 b tracked-light">Click a split sign <i class="fa-solid fa-grip-lines-vertical fa-lg txt-split"></i> : <span class="txt-split">{{selected_split}}</span>
+                                    </p>
+                                    <p class="mb2 b tracked-light">Click the edits that associated with this split edit.
+                                    </p>
+                                    <p class="tracked-light lh-paras-2">Selected edits: <span v-html="selected_edits_html"></span></p>
+                                    <!-- <p class=" mb2 b tracked-light">Select or click the text span from the <i>Original Sentence</i> that corresponds to this split edit.
+                                    </p>
+                                    <p class="tracked-light">Selected span: <span class="bg-split-light">{{selected_span_in_original}}</span></p>
+                                    <p class="mt0 mb2 b tracked-light">Select or click the text span from the <i>Simplified Sentence</i> that corresponds to this split edit.
+                                    </p>
+                                    <p class="tracked-light">Selected span: <span class="bg-split-light">{{selected_span_in_simplified}}</span></p> -->
+                                </div>
+
+                                <div class="span-selection-div" data-category="structure">
+                                    <p class="mt0 mb2 b tracked-light">Click the edits that associated with this structure change edit.
+                                    </p>
+                                    <p class="tracked-light lh-paras-2">Selected edits: <span v-html="selected_edits_html"></span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="single_part" id="explanation_div">
+                        <p class="b mb2">Explain your selection.</p>
+                        <textarea id="explanation" name="explanation" placeholder="Please write down your explanation!"
+                            rows="4" style="width: 100%; resize: none; overflow-y: hidden;"></textarea>
+                      </div> -->
+                        <!-- disable  -->
+                        <div class="buttons tc mt2">
+                            <button @click="cancel_click" class="cancel-button b quality_button bw0 ba mr2 br-pill-ns grow" type="button">Cancel <i class="fa-solid fa-close"></i></button>
+                            <button @click="save_click" class="confirm-button b quality_button bw0 ba ml2 br-pill-ns grow" type="button">Save <i class="fa-solid fa-check"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quality-selection w-100" id="deletion_edit_annotation" data-category="deletion">
+                    <p class="f3 courier ttu mv1">Annotating an Edit <i class="fa-solid fa-pencil"></i></p>
+                    <div class="f4 mt0 mb2 tc">
+                        Edit:
+                        <span class="edit-type txt-deletion f3">delete </span>
+                        <span class="pa1 edit-text br-pill-ns border-deletion-all deletion_below txt-deletion">&nbsp;{{annotating_edit_span_in_original}}&nbsp;</span>
+                    </div>
+        
+                    <!-- <input type="text" id="text_input" name="quality" placeholder="type your problem"> -->
+                    <div id="dropdown-button-container">
+                        <div class="single_part over-hide z-bigger mt3">
+                            <div class="row">
+                                <p class="mb2 b tracked-light">Is the deleted span significant to the main idea of the original sentence?</i>
+                                </p>
+                                <div class="tc">
+                                    <div class="column-severity w-25">
+                                        <input class="checkbox-tools checkbox-tools-severity " type="radio" name="severity"
+                                            id="severity-1" value="perfect" v-model="deletion_severity_box">
+                                        <label class="for-checkbox-tools-severity question-deletion" for="severity-1" id="severity-1-label">
+                                            1 - not at all
+                                        </label>
+                                    </div>
+                                    <div class="column-severity w-25">
+                                        <input class="checkbox-tools checkbox-tools-severity " type="radio" name="severity"
+                                            id="severity-2" value="good" v-model="deletion_severity_box">
+                                        <label class="for-checkbox-tools-severity question-deletion" for="severity-2" id="severity-2-label">
+                                            2 - minor
+                                        </label>
+                                    </div>
+                                    <div class="column-severity w-25">
+                                        <input class="checkbox-tools checkbox-tools-severity " type="radio" name="severity"
+                                            id="severity-3" value="bad" v-model="deletion_severity_box">
+                                        <label class="for-checkbox-tools-severity question-deletion" for="severity-3" id="severity-3-label">
+                                            3 - somewhat
+                                        </label>
+                                    </div>
+                                    <div class="column-severity w-25">
+                                        <input class="checkbox-tools checkbox-tools-severity " type="radio" name="severity"
+                                            id="severity-4" value="very bad" v-model="deletion_severity_box">
+                                        <label class="for-checkbox-tools-severity question-deletion" for="severity-4" id="severity-4-label">
+                                            4 - a lot
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <p class="pb1 b tracked-light">Does this deletion result in coreference error?
+                                    <input class="checkbox-tools-yes-no" type="radio" name="deletion-coref-yes-no"
+                                        id="deletion-coref-yes" value="yes"  v-model="deletion_coref_yes_no_box">
+                                    <label class="normal for-checkbox-tools-yes-no question-deletion" for="deletion-coref-yes">yes</label>
+                                    <input class="checkbox-tools-yes-no" type="radio" name="deletion-coref-yes-no"
+                                        id="deletion-coref-no" value="no"  v-model="deletion_coref_yes_no_box">
+                                    <label class="normal for-checkbox-tools-yes-no question-deletion" for="deletion-coref-no">no</label>
+                                </p>
+
+                                <p class="mb3 b tracked-light">Does this deletion edit introduce any fluency / grammar error?
+                                    <input class="checkbox-tools-yes-no" type="radio" name="deletion-yes-no"
+                                        id="deletion-yes" value="yes" v-model="deletion_grammar_yes_no_box">
+                                    <label class="normal for-checkbox-tools-yes-no question-deletion" for="deletion-yes">yes</label>
+                                    <input class="checkbox-tools-yes-no" type="radio" name="deletion-yes-no"
+                                        id="deletion-no" value="no" v-model="deletion_grammar_yes_no_box">
+                                    <label class="normal for-checkbox-tools-yes-no question-deletion" for="deletion-no">no</label>
+                                </p>
+                            </div>
+                        </div>
+                        <!-- <div class="single_part" id="explanation_div">
+                        <p class="b mb2">Explain your selection.</p>
+                        <textarea id="explanation" name="explanation" placeholder="Please write down your explanation!"
+                            rows="4" style="width: 100%; resize: none; overflow-y: hidden;"></textarea>
+                      </div> -->
+                        <!-- disable  -->
+                        <div class="buttons tc">
+                            <button @click="cancel_click" class="cancel-button b quality_button bw0 ba mr2 br-pill-ns grow" type="button">Cancel <i class="fa-solid fa-close"></i></button>
+                            <button @click="save_annotation_click('deletion', $event)" class="confirm-button b quality_button bw0 ba ml2 br-pill-ns" :class="{'o-40': save_validated_deletion, 'grow': !save_validated_deletion}" :disabled="save_validated_deletion">Save <i class="fa-solid fa-check"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quality-selection w-100" id="substitution_edit_annotation" data-category="substitution">
+                    <p class="f3 courier ttu mv1">Annotating an Edit <i class="fa-solid fa-pencil"></i></p>
+                    <div class="f4 mt0 mb2 tc">
+                        Edit:
+                        <span class="edit-type txt-substitution f3">substitute </span>
+                        <span class="pa1 edit-text br-pill-ns border-substitution-all substitution_below txt-substitution">&nbsp;{{annotating_edit_span_in_original}}&nbsp;</span>
+                        <span class="edit-type txt-substitution f3"> to </span>
+                        <span class="pa1 edit-text br-pill-ns border-substitution-all substitution_below txt-substitution">&nbsp;{{annotating_edit_span_in_simplified}}&nbsp;</span>
+                    </div>
+        
+                    <!-- <input type="text" id="text_input" name="quality" placeholder="type your problem"> -->
+                    <div id="dropdown-button-container">
+                        <div class="single_part over-hide z-bigger mt3">
+                            <div class="row">
+                                <div>
+                                    <p class="mb3 b tracked-light">Compared to the original phrase, the new phrase expresses:</p>
+                                    <div class="tc mt3">
+                                        <div class="column-severity w-25">
+                                            <input @click="substitution_type_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="substitution-type"
+                                            id="substitution-type-same" value="same" v-model="substitution_type_box">
+                                            <label class="for-checkbox-tools-yes-no question-substitution" for="substitution-type-same">the same meaning</label>
+                                        </div>
+                                        <div class="column-severity w-25">
+                                            <input @click="substitution_type_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="substitution-type"
+                                            id="substitution-type-less" value="less"  v-model="substitution_type_box">
+                                            <label class="for-checkbox-tools-yes-no question-substitution" for="substitution-type-less">less information</label>
+                                        </div>
+                                        <div class="column-severity w-25">
+                                            <input @click="substitution_type_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="substitution-type"
+                                                id="substitution-type-more" value="more"  v-model="substitution_type_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-type-more">more information</label>
+                                        </div>
+                                        <div class="column-severity w-25">
+                                            <input @click="substitution_type_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="substitution-type"
+                                                id="substitution-type-different" value="different"  v-model="substitution_type_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-type-different">totally different meaning</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="substitution-same substitution-type-div dn">
+                                    <p class="mb3 b tracked-light">Select the impact of this paraphrase edit on the sentence simplicity.</p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="impact_click('substitution', $event)" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-impact"
+                                                id="substitution-impact-negative" value="negative" v-model="substitution_impact_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-impact-negative">
+                                                Negative Impact
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-impact"
+                                                id="substitution-impact-no" value="no" v-model="substitution_impact_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-impact-no">
+                                                No Impact
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="impact_click('substitution', $event)" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-impact"
+                                                id="substitution-impact-positive" value="positive" v-model="substitution_impact_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-impact-positive">
+                                                Positive Impact
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="substitution-impact-positive substitution-impact-div dn">
+                                    <p class="mb3 b tracked-light">Rate the efficacy (how much it helps you to read and understand the sentence?)</i>
+                                    </p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-positive-severity"
+                                                id="substitution-positive-severity-1" value="minor" v-model="substitution_positive_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-positive-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-positive-severity"
+                                                id="substitution-positive-severity-2" value="somewhat" v-model="substitution_positive_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-positive-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-positive-severity"
+                                                id="substitution-positive-severity-3" value="a lot" v-model="substitution_positive_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-positive-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="substitution-impact-negative substitution-impact-div dn">
+                                    <p class="mb3 b tracked-light">Rate the severity (how much it makes the sentence harder to read and understand?).</p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-negative-severity"
+                                                id="substitution-negative-severity-1" value="minor" v-model="substitution_negative_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-negative-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-negative-severity"
+                                                id="substitution-negative-severity-2" value="somewhat" v-model="substitution_negative_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-negative-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-negative-severity"
+                                                id="substitution-negative-severity-3" value="a lot" v-model="substitution_negative_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-negative-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="substitution-less substitution-type-div dn">
+                                    <p class="mb2 b tracked-light">Is the deleted information significant to the main idea of the original sentence?</i>
+                                    </p>
+                                    <div class="tc">
+                                        <div class="column-severity w-25">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-less-severity"
+                                                id="substitution-less-severity-1" value="perfect" v-model="substitution_less_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-less-severity-1">
+                                                1 - not at all
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-25">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-less-severity"
+                                                id="substitution-less-severity-2" value="good" v-model="substitution_less_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-less-severity-2">
+                                                2 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-25">
+                                            <input @click="substitution_show_coref" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-less-severity"
+                                                id="substitution-less-severity-3" value="bad" v-model="substitution_less_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-less-severity-3">
+                                                3 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-25">
+                                            <input @click="substitution_show_coref" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-less-severity"
+                                                id="substitution-less-severity-4" value="very bad" v-model="substitution_less_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-less-severity-4">
+                                                4 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="substitution-coref-div dn">
+                                    <p class="mt0 pt3 b tracked-light">Does this deletion result in coreference error (i.e. "Emily" -> "She")?
+                                        <input class="checkbox-tools-yes-no" type="radio" name="substitution-coref-yes-no"
+                                            id="substitution-coref-yes" value="yes"  v-model="substitution_coref_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-substitution" for="substitution-coref-yes">yes</label>
+                                        <input class="checkbox-tools-yes-no" type="radio" name="substitution-coref-yes-no"
+                                            id="substitution-coref-no" value="no"  v-model="substitution_coref_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-substitution" for="substitution-coref-no">no</label>
+                                    </p>
+                                </div>
+                                                              
+                                <div class="substitution-more substitution-type-div dn">
+                                    <p class="mb2 b tracked-light">Select the type.
+                                    </p>
+                                    <div class="tc">
+                                        <div class="column-severity w-20">
+                                            <input @click="substitution_more_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="substitution-more-type"
+                                            id="substitution-more-type-elaboration" value="elaboration" v-model="substitution_more_type_box">
+                                            <label class="for-checkbox-tools-yes-no question-substitution" for="substitution-more-type-elaboration">Elaboration</label>
+                                        </div>
+                                        <div class="column-severity w-20">
+                                            <input @click="substitution_more_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="substitution-more-type"
+                                                id="substitution-more-type-trivial" value="trivial" v-model="substitution_more_type_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-more-type-trivial">Trivial Insertion</label>
+                                        </div>
+                                        <div class="column-severity w-20">
+                                            <input @click="substitution_more_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="substitution-more-type"
+                                            id="substitution-more-type-repetition" value="repetition" v-model="substitution_more_type_box">
+                                            <label class="for-checkbox-tools-yes-no question-substitution" for="substitution-more-type-repetition">Repetition</label>
+                                        </div>
+                                        <div class="column-severity w-20">
+                                            <input @click="substitution_more_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="substitution-more-type"
+                                            id="substitution-more-type-contradiction" value="contradiction" v-model="substitution_more_type_box">
+                                            <label class="for-checkbox-tools-yes-no question-substitution" for="substitution-more-type-contradiction">Contradiction</label>
+                                        </div>
+                                        <div class="column-severity w-20">
+                                            <input @click="substitution_more_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="substitution-more-type"
+                                            id="substitution-more-type-hallucination" value="hallucination" v-model="substitution_more_type_box">
+                                            <label class="for-checkbox-tools-yes-no question-substitution" for="substitution-more-type-hallucination">Hallucination</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="substitution-more-elaboration substitution-more-div dn">
+                                    <p class="mt0 pt3 mb2 b tracked-light">Rate the efficacy (how much it helps you to read and understand the sentence?)</i>
+                                    </p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-elaboration-severity"
+                                                id="substitution-elaboration-severity-1" value="minor"  v-model="substitution_elaboration_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-elaboration-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-elaboration-severity"
+                                                id="substitution-elaboration-severity-2" value="somewhat"  v-model="substitution_elaboration_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-elaboration-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-elaboration-severity"
+                                                id="substitution-elaboration-severity-3" value="a lot"  v-model="substitution_elaboration_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-elaboration-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="substitution-more-trivial substitution-more-div dn">
+                                    <p class="b tracked-light">Does it help you to read and understand the sentence?
+                                        <input @click="substitution_show_trivial_efficacy" class="checkbox-tools-yes-no" type="radio" name="substitution-trivial-yes-no"
+                                            id="substitution-trivial-yes" value="yes" v-model="substitution_trivial_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-substitution" for="substitution-trivial-yes">yes</label>
+                                        <input @click="substitution_hide_trivial_efficacy" class="checkbox-tools-yes-no" type="radio" name="substitution-trivial-yes-no"
+                                            id="substitution-trivial-no" value="no" v-model="substitution_trivial_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-substitution" for="substitution-trivial-no">no</label>
+                                    </p>
+                                </div>
+
+                                <div class="substitution-more-trivial-efficacy dn pb2">
+                                    <p class="pt2 b tracked-light">Rate the efficacy (how much it helps you to read and understand the sentence?)</i>
+                                    </p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-trivial-severity"
+                                                id="substitution-trivial-severity-1" value="minor" v-model="substitution_trivial_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-trivial-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-trivial-severity"
+                                                id="substitution-trivial-severity-2" value="somewhat" v-model="substitution_trivial_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-trivial-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-trivial-severity"
+                                                id="substitution-trivial-severity-3" value="a lot" v-model="substitution_trivial_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-trivial-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="substitution-more-repetition substitution-more-div mt1 dn pb2">
+                                    <p class="b tracked-light">Rate the severity (how much it makes the sentence harder to read and understand?).</p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-repetition-severity"
+                                                id="substitution-repetition-severity-1" value="minor" v-model="substitution_repetition_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-repetition-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-repetition-severity"
+                                                id="substitution-repetition-severity-2" value="somewhat" v-model="substitution_repetition_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-repetition-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-repetition-severity"
+                                                id="substitution-repetition-severity-3" value="a lot" v-model="substitution_repetition_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-repetition-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="substitution-more-contradiction substitution-more-div mt1 dn pb2">
+                                    <p class="b tracked-light">Rate the severity (how much it makes the sentence harder to read and understand?).</p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-contradiction-severity"
+                                                id="substitution-contradiction-severity-1" value="minor" v-model="substitution_contradiction_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-contradiction-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-contradiction-severity"
+                                                id="substitution-contradiction-severity-2" value="somewhat" v-model="substitution_contradiction_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-contradiction-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-contradiction-severity"
+                                                id="substitution-contradiction-severity-3" value="a lot" v-model="substitution_contradiction_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-contradiction-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="substitution-more-hallucination substitution-more-div dn">
+                                    <p class="b tracked-light">Is the new infromation hallucinated in relevant to the context?
+                                        <input class="checkbox-tools-yes-no" type="radio" name="substitution-hallucination-relevance-yes-no"
+                                            id="substitution-hallucination-relevance-yes" value="yes" v-model="substitution_hallucination_relevance_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-substitution" for="substitution-hallucination-relevance-yes">yes</label>
+                                        <input class="checkbox-tools-yes-no" type="radio" name="substitution-hallucination-relevance-yes-no"
+                                            id="substitution-hallucination-relevance-no" value="no" v-model="substitution_hallucination_relevance_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-substitution" for="substitution-hallucination-relevance-no">no</label>
+                                    </p>
+
+                                    <p class="pt2 mb3 b tracked-light">Rate the severity (how much it makes the sentence harder to read and understand?).</p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-hallucination-severity"
+                                                id="substitution-hallucination-severity-1" value="minor"  v-model="substitution_hallucination_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-hallucination-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-hallucination-severity"
+                                                id="substitution-hallucination-severity-2" value="somewhat"  v-model="substitution_hallucination_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-hallucination-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-hallucination-severity"
+                                                id="substitution-hallucination-severity-3" value="a lot"  v-model="substitution_hallucination_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-hallucination-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="substitution-different substitution-type-div dn">
+                                    <p class="mb2 b tracked-light">Rate the severity (how much it makes the sentence harder to read and understand?).</i>
+                                    </p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-different-severity"
+                                                id="substitution-different-severity-1" value="minor"  v-model="substitution_different_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-different-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-different-severity"
+                                                id="substitution-different-severity-2" value="somewhat"  v-model="substitution_different_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-different-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="substitution_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="substitution-different-severity"
+                                                id="substitution-different-severity-3" value="very"  v-model="substitution_different_severity_box">
+                                            <label class="for-checkbox-tools-severity question-substitution" for="substitution-different-severity-3">
+                                                3 - very
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="substitution-grammar-div dn">
+                                    <p class="mt0 pt3 b tracked-light">Does this substitution introduce any fluency / grammar error?
+                                        <input class="checkbox-tools-yes-no" type="radio" name="substitution-grammar-yes-no"
+                                            id="substitution-grammar-yes" value="yes"  v-model="substitution_grammar_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-substitution" for="substitution-grammar-yes">yes</label>
+                                        <input class="checkbox-tools-yes-no" type="radio" name="substitution-grammar-yes-no"
+                                            id="substitution-grammar-no" value="no"  v-model="substitution_grammar_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-substitution" for="substitution-grammar-no">no</label>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="single_part" id="explanation_div">
+                        <p class="b mb2">Explain your selection.</p>
+                        <textarea id="explanation" name="explanation" placeholder="Please write down your explanation!"
+                            rows="4" style="width: 100%; resize: none; overflow-y: hidden;"></textarea>
+                      </div> -->
+                        <!-- disable  -->
+                        <div class="buttons tc pt2">
+                            <button @click="cancel_click" class="cancel-button b quality_button bw0 ba mr2 br-pill-ns grow" type="button">Cancel <i class="fa-solid fa-close"></i></button>
+                            <button @click="save_annotation_click('substitution', $event)" class="confirm-button b quality_button bw0 ba ml2 br-pill-ns" :class="{'o-40': save_validated_substitution, 'grow': !save_validated_substitution}" :disabled="save_validated_substitution">Save <i class="fa-solid fa-check"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="quality-selection w-100" id="insertion_edit_annotation" data-category="insertion">
+                    <p class="f3 courier ttu mv1">Annotating an Edit <i class="fa-solid fa-pencil"></i></p>
+                    <div class="f4 mt0 mb2 tc">
+                        Edit:
+                        <span class="edit-type txt-insertion f3">insert </span>
+                        <span class="pa1 edit-text br-pill-ns border-insertion-all insertion_below txt-insertion">&nbsp;{{annotating_edit_span_in_simplified}}&nbsp;</span>
+                    </div>
+        
+                    <!-- <input type="text" id="text_input" name="quality" placeholder="type your problem"> -->
+                    <div id="dropdown-button-container">
+                        <div class="single_part over-hide z-bigger mt3">
+                            <div class="row">
+                                <div class="pb2">
+                                    <p class="mb2 mt3-5 b tracked-light">Select the type of this insertion edit.</i>
+                                    </p>
+                                    <div class="tc mt3">
+                                        <div class="column-severity w-20">
+                                            <input @click="insertion_type_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="insertion-type"
+                                            id="insertion-type-elaboration" value="elaboration" v-model="insertion_type_box">
+                                            <label class="for-checkbox-tools-yes-no question-insertion" for="insertion-type-elaboration">Elaboration</label>
+                                        </div>
+                                        <div class="column-severity w-20">
+                                            <input @click="insertion_type_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="insertion-type"
+                                                id="insertion-type-trivial" value="trivial" v-model="insertion_type_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-type-trivial">Trivial Insertion</label>
+                                        </div>
+                                        <div class="column-severity w-20">
+                                            <input @click="insertion_type_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="insertion-type"
+                                            id="insertion-type-repetition" value="repetition" v-model="insertion_type_box">
+                                            <label class="for-checkbox-tools-yes-no question-insertion" for="insertion-type-repetition">Repetition</label>
+                                        </div>
+                                        <div class="column-severity w-20">
+                                            <input @click="insertion_type_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="insertion-type"
+                                            id="insertion-type-contradiction" value="contradiction" v-model="insertion_type_box">
+                                            <label class="for-checkbox-tools-yes-no question-insertion" for="insertion-type-contradiction">Contradiction</label>
+                                        </div>
+                                        <div class="column-severity w-20">
+                                            <input @click="insertion_type_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="insertion-type"
+                                            id="insertion-type-hallucination" value="hallucination" v-model="insertion_type_box">
+                                            <label class="for-checkbox-tools-yes-no question-insertion" for="insertion-type-hallucination">Hallucination</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="insertion-type-elaboration insertion-type-div mt1 dn pb2">
+                                    <p class="mt0 mb2 b tracked-light">Rate the efficacy (how much it helps you to read and understand the sentence?)</i>
+                                    </p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-elaboration-severity"
+                                                id="insertion-elaboration-severity-1" value="minor" v-model="insertion_elaboration_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-elaboration-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-elaboration-severity"
+                                                id="insertion-elaboration-severity-2" value="somewhat" v-model="insertion_elaboration_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-elaboration-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-elaboration-severity"
+                                                id="insertion-elaboration-severity-3" value="a lot" v-model="insertion_elaboration_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-elaboration-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="insertion-type-trivial insertion-type-div dn pb2">
+                                    <!-- <p class="mt1 pb2 b tracked-light">Is the inserted phrase or word a transition (i.e. <i>"but"</i>, <i>"so"</i>)?
+                                        <input class="checkbox-tools-yes-no" type="radio" name="insertion-trivial-transition-yes-no"
+                                            id="insertion-trivial-transition-yes" value="yes" v-model="insertion_trivial_transition_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-insertion" for="insertion-trivial-transition-yes">yes</label>
+                                        <input class="checkbox-tools-yes-no" type="radio" name="insertion-trivial-transition-yes-no"
+                                            id="insertion-trivial-transition-no" value="no" v-model="insertion_trivial_transition_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-insertion" for="insertion-trivial-transition-no">no</label>
+                                    </p> -->
+
+                                    <p class="b tracked-light">Does it help you to read and understand the sentence?
+                                        <input @click="insertion_show_trivial_efficacy" class="checkbox-tools-yes-no" type="radio" name="insertion-trivial-yes-no"
+                                            id="insertion-trivial-yes" value="yes" v-model="insertion_trivial_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-insertion" for="insertion-trivial-yes">yes</label>
+                                        <input @click="insertion_hide_trivial_efficacy" class="checkbox-tools-yes-no" type="radio" name="insertion-trivial-yes-no"
+                                            id="insertion-trivial-no" value="no" v-model="insertion_trivial_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-insertion" for="insertion-trivial-no">no</label>
+                                    </p>
+                                </div>
+
+                                <div class="insertion-type-trivial-efficacy mt1 dn pb2">
+                                    <p class="mt0 mb2 b tracked-light">Rate the efficacy (how much it helps you to read and understand the sentence?)</i>
+                                    </p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-trivial-severity"
+                                                id="insertion-trivial-severity-1" value="minor" v-model="insertion_trivial_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-trivial-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-trivial-severity"
+                                                id="insertion-trivial-severity-2" value="somewhat" v-model="insertion_trivial_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-trivial-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-trivial-severity"
+                                                id="insertion-trivial-severity-3" value="a lot" v-model="insertion_trivial_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-trivial-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="insertion-type-repetition insertion-type-div mt1 dn pb2">
+                                    <p class="mt0 mb3 b tracked-light">Rate the severity (how much it makes the sentence harder to read and understand?).</p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-repetition-severity"
+                                                id="insertion-repetition-severity-1" value="minor" v-model="insertion_repetition_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-repetition-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-repetition-severity"
+                                                id="insertion-repetition-severity-2" value="somewhat" v-model="insertion_repetition_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-repetition-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-repetition-severity"
+                                                id="insertion-repetition-severity-3" value="a lot" v-model="insertion_repetition_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-repetition-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="insertion-type-contradiction insertion-type-div mt1 dn pb2">
+                                    <p class="mt0 mb3 b tracked-light">Rate the severity (how much it makes the sentence harder to read and understand?).</p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-contradiction-severity"
+                                                id="insertion-contradiction-severity-1" value="minor" v-model="insertion_contradiction_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-contradiction-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-contradiction-severity"
+                                                id="insertion-contradiction-severity-2" value="somewhat" v-model="insertion_contradiction_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-contradiction-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-contradiction-severity"
+                                                id="insertion-contradiction-severity-3" value="a lot" v-model="insertion_contradiction_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-contradiction-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="insertion-type-hallucination insertion-type-div mt1 dn pb2">
+                                    <p class="mt0 pb2 b tracked-light">Is the new infromation hallucinated in relevant to the context?
+                                        <input class="checkbox-tools-yes-no" type="radio" name="insertion-hallucination-relevance-yes-no"
+                                            id="insertion-hallucination-relevance-yes" value="yes" v-model="insertion_hallucination_relevance_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-insertion" for="insertion-hallucination-relevance-yes">yes</label>
+                                        <input class="checkbox-tools-yes-no" type="radio" name="insertion-hallucination-relevance-yes-no"
+                                            id="insertion-hallucination-relevance-no" value="no" v-model="insertion_hallucination_relevance_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-insertion" for="insertion-hallucination-relevance-no">no</label>
+                                    </p>
+
+                                    <p class="mt0 mb3 b tracked-light">Rate the severity (how much it makes the sentence harder to read and understand?).</p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-hallucination-severity"
+                                                id="insertion-hallucination-severity-1" value="minor" v-model="insertion_hallucination_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-hallucination-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-hallucination-severity"
+                                                id="insertion-hallucination-severity-2" value="somewhat" v-model="insertion_hallucination_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-hallucination-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="insertion_show_grammar" class="checkbox-tools checkbox-tools-severity " type="radio" name="insertion-hallucination-severity"
+                                                id="insertion-hallucination-severity-3" value="a lot" v-model="insertion_hallucination_severity_box">
+                                            <label class="for-checkbox-tools-severity question-insertion" for="insertion-hallucination-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="insertion-grammar-div dn">
+                                    <p class="mt2 mb3 b tracked-light">Does it introduce any fluency / grammar error?
+                                        <input class="checkbox-tools-yes-no" type="radio" name="insertion-yes-no"
+                                            id="insertion-yes" value="yes" v-model="insertion_grammar_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-insertion" for="insertion-yes">yes</label>
+                                        <input class="checkbox-tools-yes-no" type="radio" name="insertion-yes-no"
+                                            id="insertion-no" value="no" v-model="insertion_grammar_yes_no_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-insertion" for="insertion-no">no</label>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="single_part" id="explanation_div">
+                        <p class="b mb2">Explain your selection.</p>
+                        <textarea id="explanation" name="explanation" placeholder="Please write down your explanation!"
+                            rows="4" style="width: 100%; resize: none; overflow-y: hidden;"></textarea>
+                      </div> -->
+                        <!-- disable  -->
+                        <div class="buttons tc">
+                            <button @click="cancel_click" class="cancel-button b quality_button bw0 ba mr2 br-pill-ns grow" type="button">Cancel <i class="fa-solid fa-close"></i></button>
+                            <button @click="save_annotation_click('insertion', $event)" class="confirm-button b quality_button bw0 ba ml2 br-pill-ns" :class="{'o-40': save_validated_insertion, 'grow': !save_validated_insertion}" :disabled="save_validated_insertion">Save <i class="fa-solid fa-check"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quality-selection w-100" id="reorder_edit_annotation" data-category="reorder">
+                    <p class="f3 courier ttu mv1">Annotating an Edit <i class="fa-solid fa-pencil"></i></p>
+                    <div class="f4 mt0 mb2 tc">
+                        Edit:
+                        <span class="edit-type txt-reorder f3">reorder </span>
+                        <span class="pa1 edit-text br-pill-ns border-reorder-all reorder_below txt-reorder">&nbsp;{{annotating_edit_span_in_original}}&nbsp;</span>
+                    </div>
+        
+                    <!-- <input type="text" id="text_input" name="quality" placeholder="type your problem"> -->
+                    <div id="dropdown-button-container">
+                        <div class="single_part over-hide z-bigger mt3">
+                            <div class="row">
+                                <div>
+                                    <p class="b tracked-light">Does this reordering happen on a word-level or component-level?
+                                        <input class="checkbox-tools-yes-no" type="radio" name="reorder-level"
+                                        id="reorder-word" value="word" v-model="reorder_level_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-reorder" for="reorder-word">word-level</label>
+                                        <input class="checkbox-tools-yes-no" type="radio" name="reorder-level"
+                                            id="reorder-component" value="component" v-model="reorder_level_box">
+                                        <label class="normal for-checkbox-tools-yes-no question-reorder" for="reorder-component">component-level</label>
+                                    </p>
+                                </div>
+
+                                <div>
+                                    <p class="mb3 b tracked-light">Select the impact of this reordering edit on the sentence simplicity.</p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="impact_click('reorder', $event)" class="checkbox-tools checkbox-tools-severity " type="radio" name="reorder-impact"
+                                                id="reorder-impact-negative" value="negative" v-model="reorder_impact_box">
+                                            <label class="for-checkbox-tools-severity question-reorder" for="reorder-impact-negative">
+                                                Negative Impact
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="impact_click('reorder', $event)" class="checkbox-tools checkbox-tools-severity " type="radio" name="reorder-impact"
+                                                id="reorder-impact-no" value="no" v-model="reorder_impact_box">
+                                            <label class="for-checkbox-tools-severity question-reorder" for="reorder-impact-no">
+                                                No Impact
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="impact_click('reorder', $event)" class="checkbox-tools checkbox-tools-severity " type="radio" name="reorder-impact"
+                                                id="reorder-impact-positive" value="positive" v-model="reorder_impact_box">
+                                            <label class="for-checkbox-tools-severity question-reorder" for="reorder-impact-positive">
+                                                Positive Impact
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reorder-impact-positive reorder-impact-div dn">
+                                    <p class="mb3 b tracked-light">Rate the efficacy (how much it helps you to read and understand the sentence?)</i>
+                                    </p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="reorder-positive-severity"
+                                                id="reorder-positive-severity-1" value="minor" v-model="reorder_positive_severity_box">
+                                            <label class="for-checkbox-tools-severity question-reorder" for="reorder-positive-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="reorder-positive-severity"
+                                                id="reorder-positive-severity-2" value="somewhat" v-model="reorder_positive_severity_box">
+                                            <label class="for-checkbox-tools-severity question-reorder" for="reorder-positive-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="reorder-positive-severity"
+                                                id="reorder-positive-severity-3" value="a lot" v-model="reorder_positive_severity_box">
+                                            <label class="for-checkbox-tools-severity question-reorder" for="reorder-positive-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="reorder-impact-negative reorder-impact-div dn">
+                                    <p class="mb3 b tracked-light">Rate the severity (how much it makes the sentence harder to read and understand?).</p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="reorder-negative-severity"
+                                                id="reorder-negative-severity-1" value="minor" v-model="reorder_negative_severity_box">
+                                            <label class="for-checkbox-tools-severity question-reorder" for="reorder-negative-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="reorder-negative-severity"
+                                                id="reorder-negative-severity-2" value="somewhat" v-model="reorder_negative_severity_box">
+                                            <label class="for-checkbox-tools-severity question-reorder" for="reorder-negative-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="reorder-negative-severity"
+                                                id="reorder-negative-severity-3" value="a lot" v-model="reorder_negative_severity_box">
+                                            <label class="for-checkbox-tools-severity question-reorder" for="reorder-negative-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="b tracked-light">Does this reordering edit introduce any grammar / fluency error?
+                                    <input class="checkbox-tools-yes-no" type="radio" name="reorder-yes-no"
+                                        id="reorder-yes" value="yes" v-model="reorder_grammar_yes_no_box">
+                                    <label class="normal for-checkbox-tools-yes-no question-reorder" for="reorder-yes">yes</label>
+                                    <input class="checkbox-tools-yes-no" type="radio" name="reorder-yes-no"
+                                        id="reorder-no" value="no" v-model="reorder_grammar_yes_no_box">
+                                    <label class="normal for-checkbox-tools-yes-no question-reorder" for="reorder-no">no</label>
+                                </p>
+                            </div>
+                        </div>
+                        <!-- <div class="single_part" id="explanation_div">
+                        <p class="b mb2">Explain your selection.</p>
+                        <textarea id="explanation" name="explanation" placeholder="Please write down your explanation!"
+                            rows="4" style="width: 100%; resize: none; overflow-y: hidden;"></textarea>
+                      </div> -->
+                        <!-- disable  -->
+                        <div class="buttons tc">
+                            <button @click="cancel_click" class="cancel-button b quality_button bw0 ba mr2 br-pill-ns grow" type="button">Cancel <i class="fa-solid fa-close"></i></button>
+                            <button @click="save_annotation_click('reorder', $event)" class="confirm-button b quality_button bw0 ba ml2 br-pill-ns" :class="{'o-40': save_validated_reorder, 'grow': !save_validated_reorder}" :disabled="save_validated_reorder">Save <i class="fa-solid fa-check"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quality-selection w-100" id="split_edit_annotation" data-category="split">
+                    <p class="f3 courier ttu mv1">Annotating an Edit <i class="fa-solid fa-pencil"></i></p>
+                    <div class="f4 mt0 mb2 tc">
+                        Edit:
+                        <span class="edit-type txt-split f3">split </span>
+                        <span class="pa1 edit-text br-pill-ns border-split-all split_below txt-split">&nbsp;||&nbsp;</span>
+                        <component :is="compiled_split_annotating_span"></component>
+                    </div>
+        
+                    <!-- <input type="text" id="text_input" name="quality" placeholder="type your problem"> -->
+                    <div id="dropdown-button-container">
+                        <div class="single_part over-hide z-bigger mt3">
+                            <div class="row">
+                                <div>
+                                    <p class="mb3 b tracked-light">Select the impact of this split edit on the sentence simplicity.</p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input @click="impact_click('split', $event)" class="checkbox-tools checkbox-tools-severity " type="radio" name="split-impact"
+                                                id="split-impact-negative" value="negative" v-model="split_impact_box">
+                                            <label class="for-checkbox-tools-severity question-split" for="split-impact-negative">
+                                                Negative Impact
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="impact_click('split', $event)" class="checkbox-tools checkbox-tools-severity " type="radio" name="split-impact"
+                                                id="split-impact-no" value="no" v-model="split_impact_box">
+                                            <label class="for-checkbox-tools-severity question-split" for="split-impact-no">
+                                                No Impact
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input @click="impact_click('split', $event)" class="checkbox-tools checkbox-tools-severity " type="radio" name="split-impact"
+                                                id="split-impact-positive" value="positive" v-model="split_impact_box">
+                                            <label class="for-checkbox-tools-severity question-split" for="split-impact-positive">
+                                                Positive Impact
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="split-impact-positive split-impact-div dn">
+                                    <p class="mb3 b tracked-light">Rate the efficacy (how much it helps you to read and understand the sentence?)</i>
+                                    </p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="split-positive-severity"
+                                                id="split-positive-severity-1" value="minor" v-model="split_positive_severity_box">
+                                            <label class="for-checkbox-tools-severity question-split" for="split-positive-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="split-positive-severity"
+                                                id="split-positive-severity-2" value="somewhat" v-model="split_positive_severity_box">
+                                            <label class="for-checkbox-tools-severity question-split" for="split-positive-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="split-positive-severity"
+                                                id="split-positive-severity-3" value="a lot" v-model="split_positive_severity_box">
+                                            <label class="for-checkbox-tools-severity question-split" for="split-positive-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="split-impact-negative split-impact-div dn">
+                                    <p class="mb3 b tracked-light">Rate the severity (how much it makes the sentence harder to read and understand?).</p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="split-negative-severity"
+                                                id="split-negative-severity-1" value="minor" v-model="split_negative_severity_box">
+                                            <label class="for-checkbox-tools-severity question-split" for="split-negative-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="split-negative-severity"
+                                                id="split-negative-severity-2" value="somewhat" v-model="split_negative_severity_box">
+                                            <label class="for-checkbox-tools-severity question-split" for="split-negative-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="split-negative-severity"
+                                                id="split-negative-severity-3" value="a lot" v-model="split_negative_severity_box">
+                                            <label class="for-checkbox-tools-severity question-split" for="split-negative-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="b tracked-light">Does this split edit introduce any grammar / fluency error?
+                                    <input class="checkbox-tools-yes-no" type="radio" name="split-yes-no"
+                                        id="split-yes" value="yes" v-model="split_grammar_yes_no_box">
+                                    <label class="normal for-checkbox-tools-yes-no question-split" for="split-yes">yes</label>
+                                    <input class="checkbox-tools-yes-no" type="radio" name="split-yes-no"
+                                        id="split-no" value="no" v-model="split_grammar_yes_no_box">
+                                    <label class="normal for-checkbox-tools-yes-no question-split" for="split-no">no</label>
+                                </p>
+                            </div>
+                        </div>
+                        <!-- <div class="single_part" id="explanation_div">
+                        <p class="b mb2">Explain your selection.</p>
+                        <textarea id="explanation" name="explanation" placeholder="Please write down your explanation!"
+                            rows="4" style="width: 100%; resize: none; overflow-y: hidden;"></textarea>
+                      </div> -->
+                        <!-- disable  -->
+                        <div class="buttons tc">
+                            <button @click="cancel_click" class="cancel-button b quality_button bw0 ba mr2 br-pill-ns grow" type="button">Cancel <i class="fa-solid fa-close"></i></button>
+                            <button @click="save_annotation_click('split', $event)" class="confirm-button b quality_button bw0 ba ml2 br-pill-ns" :class="{'o-40': save_validated_split, 'grow': !save_validated_split}" :disabled="save_validated_split">Save <i class="fa-solid fa-check"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quality-selection w-100" id="structure_edit_annotation" data-category="structure">
+                    <p class="f3 courier ttu mv1">Annotating an Edit <i class="fa-solid fa-pencil"></i></p>
+                    <div class="f4 mt0 mb2 tc">
+                        Edit:
+                        <span class="edit-type txt-structure f3">structure </span>
+                        <span class="pa1 edit-text br-pill-ns border-structure-all structure_below txt-structure">&nbsp;<i class="fa-solid fa-tree"></i>&nbsp;</span>
+                        <component :is="compiled_structure_annotating_span"></component>
+                    </div>
+        
+                    <!-- <input type="text" id="text_input" name="quality" placeholder="type your problem"> -->
+                    <div id="dropdown-button-container">
+                        <div class="single_part over-hide z-bigger mt3">
+                            <div class="row">
+                                <p class="mb3 b tracked-light">Select the impact of this structure edit on the sentence simplicity.</p>
+                                <div class="tc">
+                                    <div class="column-severity w-33">
+                                        <input @click="impact_click('structure', $event)" class="checkbox-tools checkbox-tools-severity " type="radio" name="structure-impact"
+                                            id="structure-impact-negative" value="negative" v-model="structure_impact_box">
+                                        <label class="for-checkbox-tools-severity question-structure" for="structure-impact-negative">
+                                            Negative Impact
+                                        </label>
+                                    </div>
+                                    <div class="column-severity w-33">
+                                        <input @click="impact_click('structure', $event)" class="checkbox-tools checkbox-tools-severity " type="radio" name="structure-impact"
+                                            id="structure-impact-no" value="no" v-model="structure_impact_box">
+                                        <label class="for-checkbox-tools-severity question-structure" for="structure-impact-no">
+                                            No Impact
+                                        </label>
+                                    </div>
+                                    <div class="column-severity w-33">
+                                        <input @click="impact_click('structure', $event)" class="checkbox-tools checkbox-tools-severity " type="radio" name="structure-impact"
+                                            id="structure-impact-positive" value="positive" v-model="structure_impact_box">
+                                        <label class="for-checkbox-tools-severity question-structure" for="structure-impact-positive">
+                                            Positive Impact
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div class="structure-impact-positive structure-impact-div dn">
+                                    <p class="mb3 b tracked-light">Rate the efficacy (how much it helps you to read and understand the sentence?)</i>
+                                    </p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="structure-positive-severity"
+                                                id="structure-positive-severity-1" value="minor" v-model="structure_positive_severity_box">
+                                            <label class="for-checkbox-tools-severity question-structure" for="structure-positive-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="structure-positive-severity"
+                                                id="structure-positive-severity-2" value="somewhat" v-model="structure_positive_severity_box">
+                                            <label class="for-checkbox-tools-severity question-structure" for="structure-positive-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="structure-positive-severity"
+                                                id="structure-positive-severity-3" value="a lot" v-model="structure_positive_severity_box">
+                                            <label class="for-checkbox-tools-severity question-structure" for="structure-positive-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="structure-impact-negative structure-impact-div dn">
+                                    <p class="mb3 b tracked-light">Rate the severity (how much it makes the sentence harder to read and understand?).</p>
+                                    <div class="tc">
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="structure-negative-severity"
+                                                id="structure-negative-severity-1" value="minor" v-model="structure_negative_severity_box">
+                                            <label class="for-checkbox-tools-severity question-structure" for="structure-negative-severity-1">
+                                                1 - minor
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="structure-negative-severity"
+                                                id="structure-negative-severity-2" value="somewhat" v-model="structure_negative_severity_box">
+                                            <label class="for-checkbox-tools-severity question-structure" for="structure-negative-severity-2">
+                                                2 - somewhat
+                                            </label>
+                                        </div>
+                                        <div class="column-severity w-33">
+                                            <input class="checkbox-tools checkbox-tools-severity " type="radio" name="structure-negative-severity"
+                                                id="structure-negative-severity-3" value="a lot" v-model="structure_negative_severity_box">
+                                            <label class="for-checkbox-tools-severity question-structure" for="structure-negative-severity-3">
+                                                3 - a lot
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <p class="b tracked-light">Does this structure edit introduce any grammar / fluency error?
+                                    <input class="checkbox-tools-yes-no" type="radio" name="structure-yes-no"
+                                        id="structure-yes" value="yes" v-model="structure_grammar_yes_no_box">
+                                    <label class="normal for-checkbox-tools-yes-no question-structure" for="structure-yes">yes</label>
+                                    <input class="checkbox-tools-yes-no" type="radio" name="structure-yes-no"
+                                        id="structure-no" value="no" v-model="structure_grammar_yes_no_box">
+                                    <label class="normal for-checkbox-tools-yes-no question-structure" for="structure-no">no</label>
+                                </p>
+                            </div>
+                        </div>
+                        <!-- <div class="single_part" id="explanation_div">
+                        <p class="b mb2">Explain your selection.</p>
+                        <textarea id="explanation" name="explanation" placeholder="Please write down your explanation!"
+                            rows="4" style="width: 100%; resize: none; overflow-y: hidden;"></textarea>
+                      </div> -->
+                        <!-- disable  -->
+                        <div class="buttons tc">
+                            <button @click="cancel_click" class="cancel-button b quality_button bw0 ba mr2 br-pill-ns grow" type="button">Cancel <i class="fa-solid fa-close"></i></button>
+                            <button @click="save_annotation_click('structure', $event)" class="confirm-button b quality_button bw0 ba ml2 br-pill-ns" :class="{'o-40': save_validated_structure, 'grow': !save_validated_structure}" :disabled="save_validated_structure">Save <i class="fa-solid fa-check"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="mt1 cf">
+                <div class="fl w-80">
+                    <p class="f3 courier ttu">Edits Annotations (<span>{{annotated_edits}}/{{total_edits}}</span>)</p>
+                </div>
+                <div class="fl w-20 tc">
+                    <!-- <p class="f3 courier ttu">Operations</p> -->
+                    <p @click="add_an_edit" class="add_button pa2 br-pill-ns ba bw1 grow">
+                        <i class="fa-solid fa-plus fa-1-5x icon-default pointer mr2"></i>
+                        <span class="f4">Add Edit</span>
+                    </p>
+                </div>
+            </div>
+            <div>
+                <component :is="compiled_edits_html"></component>
+            </div>
+            <div id="hits-data" class="mt1 dn">{{hits_data}}</div>
+        </section>
+    </div>
+
+    <script src="../js/quiz.js"></script>
+</body>
+
+</html>
+
+
+<!-- <div class="f5 mb2 fl w-40 light-orange">Good</div>
+<div class="f5 mb2 fl light-purple">Bad</div>
+<div class="row mb3">
+    <div class="column">
+        <input @click="insertion_yes_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="insertion-type"
+            id="insertion-success-ela" value="elaboration">
+        <label class="b question-insertion light-orange" for="insertion-success-ela">
+            Elaboration
+        </label>
+    </div>
+    <div class="column">
+        <input @click="insertion_yes_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="insertion-type"
+            id="insertion-success-example" value="add example">
+        <label class="b question-insertion light-orange" for="insertion-success-example">
+            Add Example
+        </label>
+    </div>
+    <div class="column">
+        <input @click="insertion_no_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="insertion-type"
+            id="insertion-error-hallu" value="hallucination">
+        <label class="b question-insertion light-purple" for="insertion-error-hallu">
+            Hallucination
+        </label>
+    </div>
+    <div class="column">
+        <input @click="insertion_no_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="insertion-type"
+            id="insertion-error-grammar" value="grammar error">
+        <label class="b question-insertion light-purple" for="insertion-error-grammar">
+            Grammar/fluency Error
+        </label>
+    </div>
+    <div class="column">
+        <input @click="insertion_no_click" class="checkbox-tools checkbox-tools-severity" type="radio" name="insertion-type"
+            id="insertion-error-factual" value="factual error">
+        <label class="b question-insertion light-purple" for="insertion-error-factual">
+            Factual Error
+        </label>
+    </div>
+</div> -->

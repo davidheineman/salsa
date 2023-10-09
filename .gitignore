@@ -136,5 +136,5 @@ dmypy.json
 5-scores-lens-salsa.json
 checkpoints/
 slurm/
-data/
 lens-salsa-trained/
+lens-salsa-checkpoint/

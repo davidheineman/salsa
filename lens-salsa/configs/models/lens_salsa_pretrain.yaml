@@ -1,0 +1,30 @@
+unified_metric:
+  class_path: lens_salsa.models.UnifiedMetric
+  init_args:
+    nr_frozen_epochs: 0.3
+    keep_embeddings_frozen: True
+    optimizer: AdamW
+    encoder_learning_rate: 1.0e-05
+    learning_rate: 3.1e-05
+    layerwise_decay: 0.95
+    encoder_model: RoBERTa
+    pretrained_model: roberta-large
+    sent_layer: mix
+    layer_transformation: sparsemax
+    word_layer: 24
+    loss: mse
+    dropout: 0.15
+    batch_size: 4
+    train_data: 
+      - lens-salsa/data/simpeval/train.csv
+    validation_data: 
+      - lens-salsa/data/simpeval/valid.csv
+    hidden_sizes:
+      - 384
+    activations: Tanh
+    loss_lambda: 0.9
+    word_level_training: False
+    score_target: score
+trainer: ../trainer.yaml
+early_stopping: ../early_stopping.yaml
+model_checkpoint: ../model_checkpoint.yaml

@@ -1,12 +1,16 @@
-# Returns whether two spans are exactly the same
 def span_agree(span1, span2):
+    """
+    Returns whether two spans are exactly the same
+    """
     if (span1[0] == None and span2[0] == None) or (span1[0][0] == span2[0][0] and span1[0][1] == span2[0][1]):
         if (span1[1] == None and span2[1] == None) or (span1[1][0] == span2[1][0] and span1[1][1] == span2[1][1]):
             return True
     return False
 
-# Returns whether all the spans within two annotations are exactly the same
 def ann_agree(ann1, ann2):
+    """
+    Returns whether all the spans within two annotations are exactly the same
+    """
     if len(ann1) != len(ann2):
         return False
     for i in range(len(ann1)):
@@ -14,9 +18,12 @@ def ann_agree(ann1, ann2):
             return False
     return True
 
-# Returns the number of all three, two of three and no annotators agreeing
-# drop_no_spans: whether to drop sentences with no annotations
 def calculate_agreement(data, edit_type, drop_no_spans=False):
+    """
+    Returns the number of all three, two of three and no annotators agreeing
+    
+    drop_no_spans: whether to drop sentences with no annotations
+    """
     agreement = [0, 0, 0]
     for id in set([x['id'] for x in data]):
         sents = [x for x in data if x['id'] == id]

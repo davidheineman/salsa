@@ -1,0 +1,48 @@
+unified_metric:
+  class_path: lens_salsa.models.UnifiedMetric
+  init_args:
+    nr_frozen_epochs: 0.3
+    keep_embeddings_frozen: True
+    optimizer: AdamW
+    encoder_learning_rate: 1.0e-05
+    learning_rate: 3.1e-05
+    layerwise_decay: 0.95
+    encoder_model: RoBERTa
+    pretrained_model: roberta-large
+    sent_layer: mix
+    layer_transformation: sparsemax
+    word_layer: 24
+    loss: mse
+    dropout: 0.15
+    batch_size: 4
+    train_data: 
+      - lens-salsa/data/salsa/train.csv
+    validation_data: 
+      - lens-salsa/data/salsa/valid.csv
+    hidden_sizes:
+      - 384
+    activations: Tanh
+    loss_lambda: 0.9
+    initalize_pretrained_unified_weights: True
+    pretrained_unified_model: lens-salsa/checkpoints/lens-pretrained-unified/checkpoints/[PRE-TRAINED-LENS-SALSA-MODEL].ckpt
+    word_level_training: True
+    score_target: lens_score
+
+    continuous_word_labels: False
+    input_segments:
+      - word_qe_simplified
+      - word_qe_original
+    span_targets:
+      - word_qe_simplified
+      - word_qe_original
+    word_weights:
+      - 0.15 # OK
+      - 0.25 # GOOD
+      - 0.60 # BAD
+    span_tokens:
+      - good
+      - bad
+    
+trainer: ../trainer.yaml
+early_stopping: ../early_stopping.yaml
+model_checkpoint: ../model_checkpoint.yaml

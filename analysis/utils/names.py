@@ -15,20 +15,16 @@ class Information(Enum):
     DIFFERENT = 'Different Information'
 
 class Error(Enum):
-    # Content Insertion Errors
     REPETITION = 'Repetition'
     CONTRADICTION = 'Contradiction'
     HALLUCINATION = 'Hallucination'
     FACTUAL = 'Factual Error'
     IRRELEVANT = 'Irrelevant'
-    # Content Deletion Errors
     COREFERENCE = 'Coreference'
     BAD_DELETION = 'Bad Deletion'
-    # Structure Errors
     BAD_REORDER = 'Bad Reorder'
     BAD_STRUCTURE = 'Bad Structure'
     BAD_SPLIT = 'Bad Split'
-    # Lexical Errors
     UNNECESSARY_INSERTION = 'Unnecessary Insertion'
     UNNECESSARY_DELETION = 'Unnecessary Deletion'
     INFORMATION_REWRITE = 'Information Rewrite'
@@ -55,3 +51,45 @@ class Quality(Enum):
 class ReorderLevel(Enum):
     WORD = 'Word-level'
     COMPONENT = 'Component-level'
+
+content_errors = [
+    Error.HALLUCINATION,
+    Error.CONTRADICTION,
+    Error.REPETITION,
+    Error.IRRELEVANT,
+    Error.FACTUAL,
+    Error.COREFERENCE,
+    Error.BAD_DELETION
+]
+
+syntax_errors = [
+    Error.BAD_REORDER,
+    Error.BAD_STRUCTURE,
+    Error.BAD_SPLIT
+]
+
+lexical_errors = [
+    Error.COMPLEX_WORDING,
+    Error.INFORMATION_REWRITE,
+    Error.UNNECESSARY_INSERTION
+]
+
+rating_mapping = {
+    0: 1,
+    1: 2,
+    2: 3,
+    3: 4
+}
+
+default_params = {
+    'good_deletion': 5.1955782614057374, 
+    'good_insertion': 5.1955782614057374, 
+    'good_syntax': 5.4916773148765285, 
+    'good_paraphrase': 10.759154259512686, 
+    'good_trivial_insertion': 0, 
+    'content_error': -5.796703025226618, 
+    'syntax_error': -5.051975242720761, 
+    'lexical_error': 6.128637010080399,
+    'grammar_error': 6.128637010080399,
+    'size_calculation': 'exp'
+}

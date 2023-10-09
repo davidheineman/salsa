@@ -2,7 +2,12 @@ import csv, sys
 sys.path.append('../analysis')
 from utils.all import *
 
-tag_priority = ['substitution', 'insertion', 'deletion'] # last values are high priority
+tag_priority = [
+    'substitution', 
+    'insertion', 
+    'deletion'
+]
+
 tag_map = {
     'substitution': 'sub',
     'insertion': 'ins',
@@ -98,6 +103,9 @@ def write_tagged_sentence(sent, tags, tag_values):
     return out
 
 def lcs(str1, str2):
+    """
+    Get the longest common substring
+    """
     m, n = len(str1), len(str2)
     table = [[0] * (n + 1) for _ in range(m + 1)]
     max_length, end_position = 0, 0
@@ -110,11 +118,11 @@ def lcs(str1, str2):
                     end_position = i
     return str1[end_position - max_length:end_position]
 
-"""
-Convert a list of phrases to single word alignments using a (quite poor) rule-based system
-to convert edits to word alignment
-"""
 def phrase_to_word_alignment(sent, in_new, out_new, out_pred_spans):
+    """
+    Convert a list of phrases to single word alignments using a (quite poor) rule-based system
+    to convert edits to word alignment
+    """
     # Create a list of words which need rule-based alignment
     word_alignments, alignment_out = [], []
     for tag in out_pred_spans:
@@ -248,44 +256,6 @@ def print_alignment(sent, alignment):
     for t_in, t_out in alignment:
         print(f"{sent['original'][t_in[0]:t_in[1]]} -> {sent['simplified'][t_out[0]:t_out[1]]}")
 
-# To create data format for Neural Janaca, it works a bit different. Here's some example
-# data:
-
-# It exists in this format: ID, sent1, _, sent2, _, _, _, sure_align, poss_align
-# Important to note tokenization is performed via spaces
-
-# sure_align = sure alignments
-# poss_align = possible alignments
-# In Chao's paper, he uses sure+poss as the default evaluation setup.
-
-# 0:0
-# Today there are only around 20,000 wild lions left in the world .
-# N/A
-# By one estimate , fewer than 20,000 lions exist in the wild , a drop of about 40 percent in the past two decades .
-# N/A
-# 1
-# 1
-# 5-6 6-11 7-7 8-8 9-9 10-10 12-24
-# 0-0 0-1 0-2 3-4 3-5 4-4 4-5
-
-# 1:1
-# Other experts say there is little proof that grass-fed beef is healthier .
-# N/A
-# " There 's little definitive data to suggest grass-fed beef is healthier for you , " said Chad Carr , an associate professor in the university 's department of animal sciences .
-# N/A
-# 1
-# 1
-# 2-16 3-1 4-2 5-3 6-4 6-5 8-8 9-9 10-10 11-11 12-31
-# 1-17 1-18 7-6 7-7
-
-# 2:2
-# Lindsey Carillo , 31 , grew up in a suburb but wanted to expose her kids to city life .
-# N/A
-# Lindsey Carillo , 31 , grew up in a suburb of Detroit but wanted to expose her kids to city living .
-# N/A
-# 1
-# 1
-# 0-0 1-1 2-2 3-3 4-4 5-5 6-6 7-7 8-8 9-9 10-12 11-13 12-14 13-15 14-16 15-17 16-18 17-19 18-20 19-21
 
 def get_word_alignment_string(sent, collapse_phrase_alignment=False):
     orig_tags = get_annotations_per_token([sent], 'original', collapse_composite=True, remove_reorder=True, \

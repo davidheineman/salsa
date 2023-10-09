@@ -1,56 +1,49 @@
 ## LENS-SALSA
-Please note this library is built on the [**COMET**](https://github.com/Unbabel/COMET) library. 
+This guide is to train the LENS-SALA metric from scratch. For general usage, please see [**the SALSA Readme**](./README.md). Please note the LENS-SALSA training code is built on the [**COMET**](https://github.com/Unbabel/COMET) library. 
 
 ### Setup
-**Data setup:**
-Place all data in the `data` directory. The following files are required:
+```sh
+# Clone the 
+git clone https://github.com/davidheineman/salsa.git
+
+# (Optional) Create Conda env
+conda create -n lens-salsa
+conda install -n lens-salsa pip
+conda activate lens-salsa
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Download LENS checkpoint for fine-tuning
+mkdir lens-salsa/lens-checkpoint && cd lens-salsa/lens-checkpoint
+gdown 179cuRZdJZEtEObovVf_KPhNFWnMF8pkN
+unzip LENS-checkpoint
+
+# Preprocess SALSA data for training
+mkdir data
+```
+
+### Preprocess Data
+The following files are used for training:
 - `simpeval-regression/[train/valid].csv` - Raw SimpEval scores used to train regression model
 - `simpeval-multi-ref/[train/valid].csv` - Grouped references used to train multi-reference metric
-- `salsa/[train/valid].csv` - Pre-processed edit-level SALSA ratings, along with their associated SimpEval_test score used to train dual-objective
+- `salsa/[train/valid].csv` - Pre-processed edit-level SALSA ratings (along with their associated SimpEval score) used to train dual-objective word-level predictions
 
-**Download LENS checkpoint:**
-```
-mkdir checkpoints
-cd checkpoints
-gdown 179cuRZdJZEtEObovVf_KPhNFWnMF8pkN
-```
-
-### Training setups
-Fine-tune multi-reference LENS on LENS data:
-```
-python cli/train.py --cfg ~/nlprx/lens-salsa/configs/models/lens_fine_tuned_multi_ref_model.yml --load_from_checkpoint "checkpoints/lens/epoch=5-step=6102.ckpt"
+### Training LENS-SALSA
+Pre-train LENS-SALSA on SimpEval data:
+```sh
+python cli/train.py --cfg configs/models/lens_salsa_pretrain.yml
 ```
 
-Train LENS from scratch using multi-reference model:
-```
-python cli/train.py --cfg ~/nlprx/lens-salsa/configs/models/lens_fine_tuned_multi_ref_model.yml
-```
-
-Train LENS from scratch using out-of-box regression model (no fancy concatenation or multi-reference training):
-```
-python cli/train.py --cfg ~/nlprx/lens-salsa/configs/models/lens_regression_model.yml
+Fine-tune LENS-SALSA to predict word-level quality using the Unified Metric (add `--eval` to run evaluation after training):
+```sh
+python cli/train.py --cfg configs/models/lens_salsa_ft_binary.yaml            # Use {OK, ERROR} objective
+python cli/train.py --cfg configs/models/lens_salsa_ft_three_class.yaml       # Use {GOOD, OK, ERROR} objective
+python cli/train.py --cfg configs/models/lens_salsa_ft_three_continuous.yaml  # Use [-3, 3] objective
 ```
 
-Train LENS-SALSA using the Unified Metric (use `--eval` for running evaluation script after training):
+Evaluate a trained LENS-SALSA metric:
+```sh
+# (Optional) For separate validation data: Add --val_data_path [VALIDATION_DATA].csv
+python cli/evaluate.py --model_path checkpoints/[YOUR-CHECKPOINT].ckpt --output_file lens-salsa-scores.json
 ```
-python cli/train.py --cfg ~/nlprx/lens-salsa/configs/models/lens_salsa_unified_metric.yaml 
-```
-
-Evaluate a trained metric:
-```
-# Pre-trained
-python cli/evaluate.py --model_path ../checkpoints/lens-pretrained-unified/checkpoints/epoch=3-step=22500-val_kendall=0.628.ckpt --val_data_path /nethome/dheineman3/nlprx/lens-salsa/data/salsa/valid.csv --output_file 5-scores-lens-salsa.json 
-
-# Fine-tuned [-3,3]
-python cli/evaluate.py --model_path X --output_file 5-scores-lens-salsa.json
-
-# Fine-tuned {GOOD, OK, BAD}
-python cli/evaluate.py --model_path ../checkpoints/lens-salsa-testing/model_8/checkpoints/epoch=3-step=1292-val_kendall=0.312.ckpt --output_file 5-scores-lens-salsa.json
-```
-
-To replicate the table(s) in the paper:
-```
-python cli/train.py --eval --cfg ~/nlprx/lens-salsa/configs/models/lens_salsa_unified_metric.yaml 
-```
-
-python cli/evaluate.py --model_path ../checkpoints/lens-salsa-testing/model_10/checkpoints/epoch=3-step=1460-val_kendall=0.409.ckpt --val_data_path ../data/salsa/test.csv
