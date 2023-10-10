@@ -44,6 +44,6 @@ python cli/train.py --cfg configs/models/lens_salsa_ft_three_continuous.yaml  # 
 
 Evaluate a trained LENS-SALSA metric:
 ```sh
-# (Optional) For separate validation data: Add --val_data_path [VALIDATION_DATA].csv
+# (Optional) For separate test data: Add --val_data_path salsa/test.csv
 python cli/evaluate.py --model_path checkpoints/[YOUR-CHECKPOINT].ckpt --output_file lens-salsa-scores.json
 ```

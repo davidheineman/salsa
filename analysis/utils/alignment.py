@@ -1,6 +1,7 @@
-import csv, sys
-sys.path.append('../analysis')
-from utils.all import *
+import csv, copy
+
+from utils.names import *
+from utils.util import get_annotations_per_token
 
 tag_priority = [
     'substitution', 

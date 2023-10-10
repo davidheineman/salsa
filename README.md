@@ -1,7 +1,7 @@
 <div align="center">
-    <h1>SALSA 💃: Success and Failure Linguistic Simplification Annotation</h1>
+    <h1>SALSA 💃</h1>
 
-[**View the SALSA Interface**](https://salsa-eval.com/interface) | [**SALSA Tutorial**](https://salsa-eval.com/tutorial) | [**Download Dataset**](./data) | [**Use LENS-SALSA**](#lens_salsa) | [**Paper**](https://arxiv.org/abs/2305.14458)
+[**SALSA Interface**](https://salsa-eval.com/interface) | [**SALSA Tutorial**](https://salsa-eval.com/tutorial) | [**Download Dataset**](./data) | [**Use LENS-SALSA**](#lens_salsa) | [**Paper**](https://arxiv.org/abs/2305.14458)
 </div>
 
 
@@ -11,7 +11,7 @@ Our code and data for *Dancing Between Success and Failure: Edit-level Simplific
 Our interface is built with [**thresh.tools**](https://thresh.tools/?t=salsa) and is available at [**salsa-eval.com/interface**](https://salsa-eval.com/interface) with our interactive tutorial at [**salsa-eval.com/tutorial**](https://salsa-eval.com/tutorial). Our interface configuration is defined in [**interface/salsa.yml**](./interface/salsa.yml). The source code for our interactive tutorial is available in [**interface/tutorial**](./interface/tutorial).
 
 ## SALSA Dataset
-Our dataset 12K edit annotations are available in [**data**](./data), you can use the Thresh library to easily load SALSA data for your project!
+Our dataset 12K edit annotations are available in [**data**](./data), you can use the Thresh library to easily load SALSA data for your project! We also include our train/test/validation splits for training LENS-SALSA in `data/lens-salsa-training` and our data before adjucation (for calculating annotator agreement) in `data/non-adjudicated`.
 
 ```sh
 pip install thresh
@@ -62,7 +62,7 @@ score = lens_salsa.score(
 ```
 
 ## Analysis & Figures
-To replicate the analysis tables and figures in our work please refer to [**analysis/notebooks**](./analysis/notebooks).
+To replicate the analysis tables and figures in our work please refer to [**analysis**](./analysis).
 
 ## Cite SALSA
 If you find our paper, code or data helpful, please consider citing [**our work**](https://arxiv.org/abs/2305.14458):

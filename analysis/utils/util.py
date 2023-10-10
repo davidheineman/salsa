@@ -2,7 +2,6 @@ import copy
 from sty import fg, bg, ef, rs
 from utils.names import *
 
-# try not to use this
 mapping = {
     'deletion': 0,
     'substitution': 1,

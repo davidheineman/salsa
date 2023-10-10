@@ -1,0 +1,9 @@
+matplotlib
+plotly
+numpy
+sty
+pandas
+seaborn
+scikit-learn
+bert_score
+nltk
