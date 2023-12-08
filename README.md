@@ -1,7 +1,7 @@
 <div align="center">
     <h1>SALSA 💃</h1>
 
-[**SALSA Interface**](https://salsa-eval.com/interface) | [**SALSA Tutorial**](https://salsa-eval.com/tutorial) | [**Download Dataset**](./data) | [**Use LENS-SALSA**](#lens_salsa) | [**Paper**](https://arxiv.org/abs/2305.14458)
+[**SALSA Interface**](https://salsa-eval.com/interface) | [**SALSA Tutorial**](https://salsa-eval.com/tutorial) | [**Download Dataset**](./data) | [**Use LENS-SALSA**](#lens_salsa) | [**Paper**](https://aclanthology.org/2023.emnlp-main.211)
 </div>
 
 
@@ -67,10 +67,16 @@ To replicate the analysis tables and figures in our work please refer to [**anal
 ## Cite SALSA
 If you find our paper, code or data helpful, please consider citing [**our work**](https://arxiv.org/abs/2305.14458):
 ```tex
-@article{heineman2023dancing,
-  title={Dancing {B}etween {S}uccess and {F}ailure: {E}dit-level {S}implification {E}valuation using {SALSA}},
-  author={Heineman, David and Dou, Yao and Xu, Wei},
-  journal={arXiv preprint arXiv:2305.14458},
-  year={2023}
+@inproceedings{heineman-etal-2023-dancing,
+    title = "Dancing Between Success and Failure: Edit-level Simplification Evaluation using {SALSA}",
+    author = "Heineman, David and Dou, Yao and Maddela, Mounica and Xu, Wei",
+    editor = "Bouamor, Houda and Pino, Juan and Bali, Kalika",
+    booktitle = "Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing",
+    month = dec,
+    year = "2023",
+    address = "Singapore",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2023.emnlp-main.211",
+    pages = "3466--3495"
 }
 ```
