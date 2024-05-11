@@ -71,7 +71,7 @@ To replicate the analysis tables and figures in our work please refer to [**anal
 
 ## Cite SALSA
 If you find our paper, code or data helpful, please consider citing [**our work**](https://arxiv.org/abs/2305.14458):
-```tex
+```t
 @inproceedings{heineman-etal-2023-dancing,
     title = "Dancing Between Success and Failure: Edit-level Simplification Evaluation using {SALSA}",
     author = "Heineman, David and Dou, Yao and Maddela, Mounica and Xu, Wei",
