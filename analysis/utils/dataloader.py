@@ -546,9 +546,10 @@ def collapse_systems(data):
 
     return data
 
-def load_data(path, batch_num=None, preprocess=False, realign_ids=True, adjudicated=False, spans_only=False):
+def load_data(path, batch_num=None, preprocess=True, realign_ids=True, adjudicated=True, spans_only=False):
     data = []
 
+    # Load a set of annotation files, helpful for analysis during ongoing data collection
     if os.path.isdir(path):
         if not 'annotated' in path:
             raise Exception('Currently only supports format of \"annotated\" files.')
@@ -561,46 +562,37 @@ def load_data(path, batch_num=None, preprocess=False, realign_ids=True, adjudica
                 selected_files.extend([x for x in files if ('batch_' + str(num)) + '_' in x])
             files = selected_files
 
-        # Exclude corrupted file
-        if 'analysis' in path:
-            files = [x for x in files if 'batch_2_rachel' not in x]
+        log.info(f'Loading files: {files}\n')
+
+        # Add file and append user's name
+        id_counter = 0
+        batches = set([int(x.split('.')[-2].split('_')[-2]) for x in files])
+        for batch_num in batches:
+            for filename in [x for x in files if ('batch_' + str(batch_num)) in x]:
+                with open(filename, encoding='utf-8') as f:
+                    pasted_annotation = []
+                    for entry in json.load(f):
+                        pasted_annotation += [{
+                            'id': -1,
+                            'annotation_id': id_counter,
+                            'sentence_id': -1,
+                            'batch': batch_num,
+                            'hit_id': entry['id'],
+                            'user': filename.split('.')[-2].split('_')[-1],
+                            'system': entry['system'],
+                            'original': entry['original'],
+                            'simplified': entry['simplified'],
+                            'original_spans': entry['original_spans'],
+                            'simplified_spans': entry['simplified_spans'],
+                            'annotations': entry['annotations'],
+                        }]
+                        id_counter += 1
+                    data += pasted_annotation
     else:
         with open(path, 'r', encoding='utf-8') as f:
             data = json.load(f)
-        return data
-
-    log.info(f'Loading files: {files}\n')
-
-    # Add file and append user's name
-    id_counter = 0
-    batches = set([int(x.split('.')[-2].split('_')[-2]) for x in files])
-    for batch_num in batches:
-        for filename in [x for x in files if ('batch_' + str(batch_num)) in x]:
-            with open(filename, encoding='utf-8') as f:
-                pasted_annotation = []
-                for entry in json.load(f):
-                    pasted_annotation += [{
-                        'id': -1,
-                        'annotation_id': id_counter,
-                        'sentence_id': -1,
-                        'batch': batch_num,
-                        'hit_id': entry['id'],
-                        'user': filename.split('.')[-2].split('_')[-1],
-                        'system': entry['system'],
-                        'original': entry['original'],
-                        'simplified': entry['simplified'],
-                        'original_spans': entry['original_spans'],
-                        'simplified_spans': entry['simplified_spans'],
-                        'annotations': entry['annotations'],
-                    }]
-                    id_counter += 1
-
-                # We have an issue where we need to exclude GPT outputs from
-                # batches 5 and 6 because we re-do them using text-davinci-003
-                if not adjudicated and (batch_num == 5 or batch_num == 6):
-                    pasted_annotation = [sent for sent in pasted_annotation if 'GPT' not in sent['system']]
-                
-                data += pasted_annotation
+        for s in data:
+            s['hit_id'] = s['id']
 
     # ID is used to identify unique sentences, this WAS okay in the past because
     # each batch was the same ordering, but now that batches are randomized, this
@@ -637,19 +629,16 @@ def load_data(path, batch_num=None, preprocess=False, realign_ids=True, adjudica
                     for edit_id in list(sent['annotations'][type_].keys()):
                         sent['annotations'][type_][int(edit_id)] = sent['annotations'][type_][edit_id]
                         del sent['annotations'][type_][edit_id]
-
-            data = consolidate_edits(data, spans_only)        # Adds 'edits' field
-            data = consolidate_annotations(data)              # Adds 'processed_annotations' field
-
         else:
             # At the very primitive level, weirdly split edits do NOT add an ambiguous None field
             for sent in data:
-                sent['annotations']['split'] = [None] + sent['annotations']['split']
+                if isinstance(sent['annotations']['split'], list):  
+                    sent['annotations']['split'] = [None] + sent['annotations']['split']
 
-            data = consolidate_edits(data, spans_only)        # Adds 'edits' field
-            data = consolidate_annotations(data)              # Adds 'processed_annotations' field
+        data = consolidate_edits(data, spans_only)        # Adds 'edits' field
+        data = consolidate_annotations(data)              # Adds 'processed_annotations' field
             
-        data = add_simpeval_scores(data)                      # Adds 'simpeval_scores' field. Can optionally not take the z-score normalized scores with "json=True"
+        # data = add_simpeval_scores(data)                    # Adds 'simpeval_scores' field. Can optionally not take the z-score normalized scores with "json=True"
         data = calculate_sentence_scores(data)                # Adds 'score' field
         data = calculate_subscores(data)                      # Adds 'subscores' field
         data = collapse_systems(data)                         # Fix 'system' field to not distinguish between datasets

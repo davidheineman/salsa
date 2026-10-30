@@ -138,3 +138,6 @@ checkpoints/
 slurm/
 lens-salsa-trained/
 lens-salsa-checkpoint/
+
+salsa-non-adjudicated/
+camera-ready**

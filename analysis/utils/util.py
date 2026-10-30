@@ -11,23 +11,6 @@ mapping = {
     'structure': 5
 }
 
-# Utility class for creating edit type trees
-class Node:
-    def __init__(self, amount, label, id):
-        self.children = []
-        self.amount = amount
-        self.label = label
-        self.id = id
-
-    def add_child(self, child):
-        self.children.append(child)
-
-    def get_children(self):
-        return self.children
-
-    def __str__(self):
-        return str([self.label, self.amount, [str(x) for x in self.children]])
-
 # Counts some slice of annotations
 def count_data(data, edit_type=None, information_impact=None, quality_type=None, error_type=None, rating=None, length_normalized=False):
     annotations = [i for j in [x['processed_annotations'] for x in data] for i in j]
@@ -646,3 +629,26 @@ def count_dataset_composite_edits(data, parent_type):
     for type_ in [x for x in edit_types if x != 'structure' and x != 'split']:
         counts[type_] = len([x for x in composite_edits if x['type'] == type_])
     return counts
+
+def get_annotations_by_edit_family(data, edit_type):
+    information_change = None
+    if edit_type == 'paraphrase':
+        family = Family.LEXICAL
+        edit_type = 'substitution'
+    elif edit_type == 'split' or edit_type == 'structure' or edit_type == 'reorder':
+        family = Family.SYNTAX
+    elif edit_type == 'elaboration' or edit_type == 'generalization':
+        family = Family.CONTENT
+        if edit_type == 'elaboration':
+            information_change = Information.MORE
+        elif edit_type == 'generalization':
+            information_change = Information.LESS
+    else:
+        raise ValueError(f'Edit type not supported for this operation: {edit_type}')
+
+    anns = [ann for sent in data for ann in sent['processed_annotations']]
+    selected = [ann for ann in anns if ann['family'] == family and ann['edit_type'] == edit_type]
+    if edit_type == 'elaboration' or edit_type == 'generalization':
+        selected = [ann for ann in anns if ann['information_impact'] == information_change]
+
+    return selected
